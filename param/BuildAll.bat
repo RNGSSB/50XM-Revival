@@ -8,4 +8,6 @@ copy /y common.prc "build"
 copy /y fighter_param.prc "build"
 copy /y fighter_param_motion.prc "build"
 
-cd \k
+cmd \k
+
+

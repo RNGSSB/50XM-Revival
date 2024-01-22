@@ -7,6 +7,9 @@ mods = {
     hash("fighter_kind_gaogaen"): {
         hash("run_speed_max"): 1.45,
     },
+    hash("fighter_kind_fox"): {
+        hash("run_speed_max"): 2.4,
+    },
 }
 
 
@@ -22,6 +25,7 @@ for fighter in table:
     jumpspeed = fighter[hash("jump_initial_y")]
     shorthop = fighter[hash("mini_jump_y")]
     runspeed = fighter[hash("run_speed_max")]
+    airspeed = fighter[hash("air_speed_x_stable")]
     
     gravity = gravity.value * 1.2
     fallspeed = fallspeed.value * 1.4
@@ -30,6 +34,7 @@ for fighter in table:
     jumpspeed = jumpspeed.value * 0.65
     shorthop = shorthop.value * 0.8
     runspeed = runspeed.value * 0.91
+    airspeed = airspeed.value * 0.952
     
     fighter[hash("air_accel_y")].value = gravity
     fighter[hash("air_speed_y_stable")].value = fallspeed
@@ -40,6 +45,7 @@ for fighter in table:
     fighter[hash("jump_initial_y")].value = jumpspeed
     fighter[hash("mini_jump_y")].value = shorthop
     fighter[hash("run_speed_max")].value = runspeed
+    fighter[hash("air_speed_x_stable")].value = airspeed
     
     
     if fighter_name in mods:
