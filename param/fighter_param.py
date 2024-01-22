@@ -21,6 +21,7 @@ for fighter in table:
     traction = fighter[hash("ground_brake")]
     jumpspeed = fighter[hash("jump_initial_y")]
     shorthop = fighter[hash("mini_jump_y")]
+    runspeed = fighter[hash("run_speed_max")]
     
     gravity = gravity.value * 1.2
     fallspeed = fallspeed.value * 1.4
@@ -28,6 +29,7 @@ for fighter in table:
     traction = traction.value * 0.6
     jumpspeed = jumpspeed.value * 0.65
     shorthop = shorthop.value * 0.8
+    runspeed = runspeed.value * 0.91
     
     fighter[hash("air_accel_y")].value = gravity
     fighter[hash("air_speed_y_stable")].value = fallspeed
@@ -37,7 +39,7 @@ for fighter in table:
     fighter[hash("ground_brake")].value = traction
     fighter[hash("jump_initial_y")].value = jumpspeed
     fighter[hash("mini_jump_y")].value = shorthop
-    fighter[hash("wall_jump_type")].value = True
+    fighter[hash("run_speed_max")].value = runspeed
     
     
     if fighter_name in mods:
