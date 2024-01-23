@@ -65,7 +65,7 @@ common[hash("damage_fly_reflect_d_speed_mul")].value = 0.9 # 0.9
 common[hash("dead_down_damage_check_bottom")].value = float('nan') 
 
 #Shieldstun stuff lmao
-common[hash("shield_setoff_add")].value = 3 #Normal value is 3
+common[hash("shield_setoff_add")].value = 6 #Normal value is 3
 common[hash("shield_setoff_mul")].value = 0.8 #Normal value is 0.8
 common[hash("shield_setoff_mul_fighter_shot")].value = 0.29 #Normal value is 0.29
 common[hash("shield_stiff_mul_attack_4")].value = 0.725 #Normal value is 0.725 

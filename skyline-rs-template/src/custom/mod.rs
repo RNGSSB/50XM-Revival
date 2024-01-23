@@ -16,6 +16,15 @@ use smash::app::FighterKineticEnergyGravity;
 use smash_script::lua_args;
 use smash::app::sv_animcmd::*;
 
+static mut LAGCANCELED: [bool; 9] = [false; 9];
+static mut LEDGE_POS: [Vector3f; 9] = [smash::phx::Vector3f { x: 0.0, y: 0.0, z: 0.0}; 9];
+static mut ECB_Y_OFFSETS: [f32; 9] = [0.0; 9];
+
+
+pub unsafe fn get_player_number(boma: &mut smash::app::BattleObjectModuleAccessor) -> usize {
+    return WorkModule::get_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+}
+
 pub unsafe fn shieldStops(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, cat1: i32) { //Shield Stop
     if status_kind == *FIGHTER_STATUS_KIND_DASH || status_kind == *FIGHTER_STATUS_KIND_TURN_DASH || status_kind == *FIGHTER_STATUS_KIND_LANDING
     || status_kind == *FIGHTER_STATUS_KIND_LANDING_LIGHT {
@@ -35,6 +44,12 @@ pub unsafe fn dashPlatformDrop(boma: &mut smash::app::BattleObjectModuleAccessor
                     }
                 }
             }
+    }
+
+    if [*FIGHTER_STATUS_KIND_RUN].contains(&status_kind){
+        if stick_value_y <= -0.66 {
+            StatusModule::change_status_request_from_script(boma, *FIGHTER_STATUS_KIND_SQUAT, true);
+        }
     }
 }
 
@@ -62,11 +77,146 @@ pub unsafe fn fixbackdash(boma: &mut smash::app::BattleObjectModuleAccessor, sta
     }
 }
 
+#[skyline::hook(replace = smash::app::lua_bind::WorkModule::get_param_float)]
+//Landing lag stuff
+pub unsafe fn get_param_float_hook(boma: &mut smash::app::BattleObjectModuleAccessor, param_type: u64, param_hash: u64) -> f32 {
+    let status_kind = StatusModule::status_kind(boma);
+    let stick_value_y = ControlModule::get_stick_y(boma);
+    let fighter_kind = get_kind(boma);
+    if param_hash == 0 {
+     if [hash40("landing_attack_air_frame_n"), hash40("landing_attack_air_frame_hi"), hash40("landing_attack_air_frame_lw"), 
+                 hash40("landing_attack_air_frame_f"), hash40("landing_attack_air_frame_b")].contains(&param_type) {
+            let origLandingLag = original!()(boma, param_type, param_hash);
+            if LAGCANCELED[get_player_number(boma)] {
+                return origLandingLag;
+            }
+            else {
+                let newLandingLag = (origLandingLag + 5.0) as i32;
+                return newLandingLag as f32;
+            }
+        }
+    }
+    original!()(boma, param_type, param_hash)
+}
+
+pub unsafe fn lagCanceled(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32) {
+    if [*FIGHTER_STATUS_KIND_ATTACK_AIR, *FIGHTER_STATUS_KIND_LANDING_ATTACK_AIR].contains(&status_kind) {
+        if AttackModule::is_infliction_status(boma, *COLLISION_KIND_MASK_HIT) || AttackModule::is_infliction_status(boma, *COLLISION_KIND_MASK_SHIELD) {
+            LAGCANCELED[get_player_number(boma)] = true;
+        }
+    }
+    else {
+        LAGCANCELED[get_player_number(boma)] = false;
+    }
+}
+
+pub unsafe fn shieldDrops(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, cat2: i32) {
+    if status_kind == *FIGHTER_STATUS_KIND_GUARD || status_kind == *FIGHTER_STATUS_KIND_GUARD_ON { //Shield Drop
+        if (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_GUARD_TO_PASS) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_HI) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_LW) != 0  ||
+        (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_S_L) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_S_R) != 0 {
+            if GroundModule::is_passable_ground(boma) {
+                StatusModule::change_status_request_from_script(boma, *FIGHTER_STATUS_KIND_PASS, true);
+            }
+        }
+    }
+}
+
+pub unsafe fn meleeECBs(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, situation_kind: i32, fighter_kind: i32) {
+    let mut offset = smash::phx::Vector2f { x: 0.0, y: 0.0};
+        let mut max_offset = 0.0;
+        let vanilla_ecb =     [*FIGHTER_STATUS_KIND_CAPTURE_PULLED, *FIGHTER_STATUS_KIND_CAPTURE_WAIT, *FIGHTER_STATUS_KIND_CAPTURE_DAMAGE, *FIGHTER_STATUS_KIND_CAPTURE_CUT,
+                               *FIGHTER_STATUS_KIND_THROWN].contains(&StatusModule::prev_status_kind(boma, 0)) ||
+                               [*FIGHTER_STATUS_KIND_CAPTURE_PULLED, *FIGHTER_STATUS_KIND_CAPTURE_WAIT, *FIGHTER_STATUS_KIND_CAPTURE_DAMAGE, *FIGHTER_STATUS_KIND_CAPTURE_CUT,
+                                *FIGHTER_STATUS_KIND_ENTRY, *FIGHTER_STATUS_KIND_THROWN, *FIGHTER_STATUS_KIND_DAMAGE_FLY, *FIGHTER_STATUS_KIND_DAMAGE_FLY_ROLL, 
+                                *FIGHTER_STATUS_KIND_DAMAGE_FLY_METEOR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U,
+                                *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_D, *FIGHTER_STATUS_KIND_DAMAGE_FALL, *FIGHTER_STATUS_KIND_TREAD_DAMAGE_AIR, *FIGHTER_STATUS_KIND_BURY,
+                                *FIGHTER_STATUS_KIND_BURY_WAIT].contains(&status_kind);
+                                
+        let air_trans = WorkModule::get_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_FRAME_IN_AIR) < 10;
+                
+            
+        if  [*FIGHTER_KIND_KIRBY, *FIGHTER_KIND_PIKACHU, *FIGHTER_KIND_NESS, *FIGHTER_KIND_PURIN, *FIGHTER_KIND_GAMEWATCH, *FIGHTER_KIND_POPO, *FIGHTER_KIND_NANA, 
+            *FIGHTER_KIND_PICHU, *FIGHTER_KIND_METAKNIGHT, *FIGHTER_KIND_WARIO, *FIGHTER_KIND_PZENIGAME, *FIGHTER_KIND_PFUSHIGISOU, *FIGHTER_KIND_LUCAS, 
+            *FIGHTER_KIND_PIKMIN, *FIGHTER_KIND_TOONLINK, *FIGHTER_KIND_DUCKHUNT, *FIGHTER_KIND_MURABITO, *FIGHTER_KIND_INKLING, *FIGHTER_KIND_SHIZUE].contains(&fighter_kind) {
+                max_offset = 2.0;
+            }
+            
+        if  [*FIGHTER_KIND_MARIO, *FIGHTER_KIND_YOSHI, *FIGHTER_KIND_LUIGI, *FIGHTER_KIND_MARIOD, *FIGHTER_KIND_YOUNGLINK, *FIGHTER_KIND_PLIZARDON, *FIGHTER_KIND_DIDDY, 
+            *FIGHTER_KIND_DEDEDE, *FIGHTER_KIND_ROCKMAN, *FIGHTER_KIND_GEKKOUGA, *FIGHTER_KIND_PACMAN, *FIGHTER_KIND_KOOPAJR, *FIGHTER_KIND_PACKUN, *FIGHTER_KIND_MIIFIGHTER, 
+            *FIGHTER_KIND_MIISWORDSMAN, *FIGHTER_KIND_MIIGUNNER, *FIGHTER_KIND_PACKUN, *FIGHTER_KIND_BUDDY].contains(&fighter_kind) {
+                max_offset = 3.5;
+            }
+            
+        if  [*FIGHTER_KIND_FOX, *FIGHTER_KIND_FALCO, *FIGHTER_KIND_DAISY, *FIGHTER_KIND_MEWTWO, *FIGHTER_KIND_PIT, *FIGHTER_KIND_PITB, *FIGHTER_KIND_SONIC, *FIGHTER_KIND_LUCARIO, 
+            *FIGHTER_KIND_ROBOT, *FIGHTER_KIND_WOLF, *FIGHTER_KIND_LITTLEMAC, *FIGHTER_KIND_KROOL, *FIGHTER_KIND_GAOGAEN, *FIGHTER_KIND_TANTAN, *FIGHTER_KIND_PICKEL].contains(&fighter_kind) {
+                max_offset = 4.0;
+            }
+            
+        if  [*FIGHTER_KIND_DONKEY, *FIGHTER_KIND_LINK, *FIGHTER_KIND_SAMUS, *FIGHTER_KIND_SAMUSD, *FIGHTER_KIND_CAPTAIN, *FIGHTER_KIND_PEACH, *FIGHTER_KIND_KOOPA, 
+            *FIGHTER_KIND_SHEIK, *FIGHTER_KIND_ZELDA, *FIGHTER_KIND_MARTH, *FIGHTER_KIND_LUCINA, *FIGHTER_KIND_GANON, *FIGHTER_KIND_ROY, *FIGHTER_KIND_CHROM, 
+            *FIGHTER_KIND_SZEROSUIT, *FIGHTER_KIND_SNAKE, *FIGHTER_KIND_IKE, *FIGHTER_KIND_WIIFIT, *FIGHTER_KIND_ROSETTA, *FIGHTER_KIND_PALUTENA, 
+            *FIGHTER_KIND_REFLET, *FIGHTER_KIND_SHULK, *FIGHTER_KIND_RYU, *FIGHTER_KIND_KEN, *FIGHTER_KIND_CLOUD, *FIGHTER_KIND_KAMUI, *FIGHTER_KIND_BAYONETTA, 
+            *FIGHTER_KIND_RIDLEY, *FIGHTER_KIND_SIMON, *FIGHTER_KIND_RICHTER, *FIGHTER_KIND_JACK, *FIGHTER_KIND_BRAVE, *FIGHTER_KIND_DOLLY, *FIGHTER_KIND_MASTER, *FIGHTER_KIND_EDGE].contains(&fighter_kind) {
+                max_offset = 5.0;
+            }
+            
+        if status_kind == *FIGHTER_STATUS_KIND_ENTRY {
+                max_offset = 0.0;
+            }
+            
+        if (StatusModule::prev_status_kind(boma, 0) == *FIGHTER_STATUS_KIND_PASS) && MotionModule::frame(boma) < 10.0 {
+                max_offset = 0.0;
+            }
+            
+        if situation_kind == *SITUATION_KIND_AIR {// || status_kind == FIGHTER_STATUS_KIND_JUMP || status_kind == FIGHTER_STATUS_KIND_JUMP_AERIAL || status_kind == FIGHTER_STATUS_KIND_FALL || status_kind == FIGHTER_STATUS_KIND_FALL_AERIAL || status_kind == FIGHTER_STATUS_KIND_FALL_SPECIAL){
+    
+            if ECB_Y_OFFSETS[get_player_number(boma)] < max_offset {
+                ECB_Y_OFFSETS[get_player_number(boma)] += 0.05;
+            }
+            else {
+                ECB_Y_OFFSETS[get_player_number(boma)] = max_offset;
+            }
+                
+            //ecb_y_offsets[WorkModule::get_int(boma, FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID)] = max_offset;
+                
+            offset.x = 0.0;
+            offset.y = ECB_Y_OFFSETS[get_player_number(boma)];
+
+            if !(vanilla_ecb || air_trans) {
+                GroundModule::set_rhombus_offset(boma, &offset);
+            }
+        }
+            
+        else if situation_kind == *SITUATION_KIND_GROUND {
+            max_offset = 0.0;
+            //ecb_y_offsets[nx::utils::get_player_number(boma)] = max_offset;
+                
+            offset.x = 0.0;
+            //offset.y = ecb_y_offsets[nx::utils::get_player_number(boma)];
+            offset.y = 0.0;
+            if !vanilla_ecb {
+                GroundModule::set_rhombus_offset(boma, &offset);
+            }
+                
+        }
+            
+        else{
+            ECB_Y_OFFSETS[get_player_number(boma)] = 0.0;
+            offset.x = 0.0;
+            offset.y = ECB_Y_OFFSETS[get_player_number(boma)];
+                
+            if !vanilla_ecb {
+                GroundModule::set_rhombus_offset(boma, &offset);
+            }
+        }
+}
+
 pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     JostleModule::set_team(fighter.module_accessor, 0);
     let module_accessor = &mut *fighter.module_accessor;
     let situation_kind = StatusModule::situation_kind(fighter.module_accessor);
     let status_kind = StatusModule::status_kind(fighter.module_accessor);
+    let fighter_kind = get_kind(module_accessor);
     let cat1 = ControlModule::get_command_flag_cat(fighter.module_accessor, 0);
     let cat2 = ControlModule::get_command_flag_cat(fighter.module_accessor, 1);
     let cat3 = ControlModule::get_command_flag_cat(fighter.module_accessor, 2);
@@ -76,7 +226,24 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     let curr_frame = MotionModule::frame(fighter.module_accessor);
 
     shieldStops(module_accessor, status_kind, cat1);
+    shieldDrops(module_accessor, status_kind, cat2);
     dashPlatformDrop(module_accessor, status_kind, situation_kind, stick_value_y, stick_value_x);
     pivots(module_accessor, status_kind, curr_frame, stick_value_x);
     fixbackdash(module_accessor, status_kind, motion_kind, cat1, stick_value_y);
+    lagCanceled(module_accessor, status_kind);
+    meleeECBs(module_accessor, status_kind, situation_kind, fighter_kind);
+}
+
+pub fn install() {
+    // Removes 10f C-stick lockout for tilt stick and special stick
+    skyline::patching::Patch::in_text(0x17527dc).data(0x2A1F03FA);
+    skyline::patching::Patch::in_text(0x17527e0).nop();
+    skyline::patching::Patch::in_text(0x17527e4).nop();
+    skyline::patching::Patch::in_text(0x17527e8).nop();
+
+    // Prevents buffered C-stick aerials from triggering nair
+    skyline::patching::Patch::in_text(0x6be644).data(0x52800040);
+
+    skyline::install_hook!(get_param_float_hook);
+    
 }

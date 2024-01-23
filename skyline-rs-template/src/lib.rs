@@ -12,4 +12,5 @@ mod custom;
 #[skyline::main(name = "smashline_test")]
 pub fn main() {
     mario::install();
+    custom::install();
 }
