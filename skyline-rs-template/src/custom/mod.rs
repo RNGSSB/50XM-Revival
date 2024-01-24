@@ -20,14 +20,15 @@ static mut LAGCANCELED: [bool; 9] = [false; 9];
 static mut LEDGE_POS: [Vector3f; 9] = [smash::phx::Vector3f { x: 0.0, y: 0.0, z: 0.0}; 9];
 static mut ECB_Y_OFFSETS: [f32; 9] = [0.0; 9];
 
+mod jumpsquat;
+
 
 pub unsafe fn get_player_number(boma: &mut smash::app::BattleObjectModuleAccessor) -> usize {
     return WorkModule::get_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 }
 
 pub unsafe fn shieldStops(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, cat1: i32) { //Shield Stop
-    if status_kind == *FIGHTER_STATUS_KIND_DASH || status_kind == *FIGHTER_STATUS_KIND_TURN_DASH || status_kind == *FIGHTER_STATUS_KIND_LANDING
-    || status_kind == *FIGHTER_STATUS_KIND_LANDING_LIGHT {
+    if status_kind == *FIGHTER_STATUS_KIND_DASH || status_kind == *FIGHTER_STATUS_KIND_TURN_DASH {
         if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ESCAPE) != 0 || ControlModule::check_button_trigger(boma, *CONTROL_PAD_BUTTON_GUARD) {
             StatusModule::change_status_request_from_script(boma, *FIGHTER_STATUS_KIND_GUARD_ON, true);
         }
@@ -211,6 +212,144 @@ pub unsafe fn meleeECBs(boma: &mut smash::app::BattleObjectModuleAccessor, statu
         }
 }
 
+pub unsafe fn init_settings_edges(boma: &mut BattleObjectModuleAccessor, situation: smash::app::SituationKind, arg3: i32, arg4: u32,
+    ground_cliff_check_kind: smash::app::GroundCliffCheckKind, arg6: bool,
+    arg7: i32, arg8: i32, arg9: i32, arg10: i32) -> u32 {
+    /* "fix" forces GroundModule::correct to be called for the statuses we need */
+    let mut fix = arg4;
+    let category = get_category(boma);
+    let fighter_kind = get_kind(boma);
+    let status_kind = StatusModule::status_kind(boma);
+    let situation_kind = StatusModule::situation_kind(boma);
+
+    if category == *BATTLE_OBJECT_CATEGORY_FIGHTER {
+        if [*FIGHTER_STATUS_KIND_WAIT, *FIGHTER_STATUS_KIND_DASH, *FIGHTER_STATUS_KIND_TURN, *FIGHTER_STATUS_KIND_TURN_DASH, *FIGHTER_STATUS_KIND_SQUAT, *FIGHTER_STATUS_KIND_SQUAT_WAIT, 
+        *FIGHTER_STATUS_KIND_SQUAT_F, *FIGHTER_STATUS_KIND_SQUAT_B, *FIGHTER_STATUS_KIND_SQUAT_RV, *FIGHTER_STATUS_KIND_LANDING, *FIGHTER_STATUS_KIND_LANDING_LIGHT, 
+        *FIGHTER_STATUS_KIND_LANDING_FALL_SPECIAL, *FIGHTER_STATUS_KIND_LANDING_DAMAGE_LIGHT, *FIGHTER_STATUS_KIND_GUARD_DAMAGE,
+        *FIGHTER_STATUS_KIND_DAMAGE, *FIGHTER_STATUS_KIND_RUN, *FIGHTER_STATUS_KIND_TURN_RUN,
+        *FIGHTER_STATUS_KIND_APPEAL, *FIGHTER_STATUS_KIND_ESCAPE_AIR, *FIGHTER_STATUS_KIND_ESCAPE_AIR_SLIDE].contains(&status_kind) {
+            fix = *GROUND_CORRECT_KIND_GROUND as u32;
+        }
+        /*if situation_kind == *SITUATION_KIND_GROUND {
+            if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_S { //Side b's
+                if [*FIGHTER_KIND_INKLING, *FIGHTER_KIND_DIDDY].contains(&fighter_kind) {
+                    fix = *GROUND_CORRECT_KIND_GROUND as u32;
+                }
+                if fighter_kind == *FIGHTER_KIND_JACK {
+                    fix = *GROUND_CORRECT_KIND_GROUND as u32;
+                }
+            }
+            if fighter_kind == *FIGHTER_KIND_JACK { // Joker gun edge cancels
+                if [*FIGHTER_JACK_STATUS_KIND_SPECIAL_N_LANDING, *FIGHTER_JACK_STATUS_KIND_SPECIAL_N_BARRAGE_END].contains(&status_kind) {
+                    fix = *GROUND_CORRECT_KIND_GROUND as u32;
+                }
+            }
+            if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_HI { //Up specials
+                if [*FIGHTER_KIND_PIKACHU, *FIGHTER_KIND_GEKKOUGA, *FIGHTER_KIND_INKLING].contains(&fighter_kind) {
+                    fix = *GROUND_CORRECT_KIND_GROUND as u32;
+                }
+            }
+            if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_N { //Neutral Specials
+                if [*FIGHTER_KIND_JACK, *FIGHTER_KIND_PLIZARDON].contains(&fighter_kind) {
+                    fix = *GROUND_CORRECT_KIND_GROUND as u32;
+                }
+            }
+            if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_LW { //Down Special edgecancels
+                if [*FIGHTER_KIND_CAPTAIN, *FIGHTER_KIND_NESS, *FIGHTER_KIND_INKLING].contains(&fighter_kind) {
+                    fix = *GROUND_CORRECT_KIND_GROUND as u32;
+                }
+            }
+            if fighter_kind == *FIGHTER_KIND_CAPTAIN {
+                if [*FIGHTER_CAPTAIN_STATUS_KIND_SPECIAL_LW_END, *FIGHTER_CAPTAIN_STATUS_KIND_SPECIAL_LW_WALL_END].contains(&status_kind) {
+                    fix = *GROUND_CORRECT_KIND_GROUND as u32;
+                }
+            }
+            if fighter_kind == *FIGHTER_KIND_MIIFIGHTER {
+                if [*FIGHTER_MIIFIGHTER_STATUS_KIND_SPECIAL_LW2_KICK, *FIGHTER_MIIFIGHTER_STATUS_KIND_SPECIAL_LW2_KICK_LANDING].contains(&status_kind) {
+                    fix = *GROUND_CORRECT_KIND_GROUND as u32;
+                }
+            }
+        }*/
+    }
+    return fix;
+}
+
+#[skyline::hook(replace=GroundModule::correct)]
+unsafe fn correct_hook(boma: &mut BattleObjectModuleAccessor, kind: GroundCorrectKind) -> u64 {
+    let status_kind = StatusModule::status_kind(boma);
+    let situation_kind = StatusModule::situation_kind(boma);
+    let fighter_kind = get_kind(boma);
+    let category = get_category(boma);
+
+    if category == *BATTLE_OBJECT_CATEGORY_FIGHTER {
+        if [*FIGHTER_STATUS_KIND_ESCAPE_AIR, *FIGHTER_STATUS_KIND_LANDING, *FIGHTER_STATUS_KIND_TURN_DASH, *FIGHTER_STATUS_KIND_DASH,
+        *FIGHTER_STATUS_KIND_TURN_RUN, *FIGHTER_STATUS_KIND_RUN, *FIGHTER_STATUS_KIND_LANDING_FALL_SPECIAL, *FIGHTER_STATUS_KIND_WAIT].contains(&status_kind) {
+            return original!()(boma, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+        }
+        /*if situation_kind == *SITUATION_KIND_GROUND {
+            if status_kind == *FIGHTER_STATUS_KIND_ATTACK_DASH {
+                if [*FIGHTER_KIND_BUDDY, *FIGHTER_KIND_DONKEY, *FIGHTER_KIND_KIRBY].contains(&fighter_kind) {
+                    return original!()(boma, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+                }
+            }
+            if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_S { //Side b's
+                if [*FIGHTER_KIND_INKLING, *FIGHTER_KIND_LITTLEMAC, *FIGHTER_KIND_BAYONETTA, *FIGHTER_KIND_DIDDY, *FIGHTER_KIND_SHIZUE, *FIGHTER_KIND_MARTH, *FIGHTER_KIND_JACK, *FIGHTER_KIND_GANON].contains(&fighter_kind) {
+                    return original!()(boma, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+                }
+            }
+            if fighter_kind == *FIGHTER_KIND_JACK { // Joker gun edge cancels
+                if [*FIGHTER_JACK_STATUS_KIND_SPECIAL_N_ESCAPE, *FIGHTER_JACK_STATUS_KIND_SPECIAL_N_LANDING, *FIGHTER_JACK_STATUS_KIND_SPECIAL_N_BARRAGE_END].contains(&status_kind) {
+                    return original!()(boma, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+                }
+            }
+            if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_HI { //Up specials
+                if [*FIGHTER_KIND_CLOUD, *FIGHTER_KIND_PIKACHU, *FIGHTER_KIND_GEKKOUGA, *FIGHTER_KIND_INKLING, *FIGHTER_KIND_PICHU].contains(&fighter_kind) {
+                    return original!()(boma, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+                }
+            }
+            if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_N { //Neutral Specials
+                if [*FIGHTER_KIND_JACK, *FIGHTER_KIND_MARTH, *FIGHTER_KIND_PLIZARDON].contains(&fighter_kind) {
+                    return original!()(boma, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+                }
+            }
+            if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_LW { //Down Special edgecancels
+                if [*FIGHTER_KIND_CAPTAIN, *FIGHTER_KIND_NESS, *FIGHTER_KIND_INKLING, *FIGHTER_KIND_GANON].contains(&fighter_kind) {
+                    return original!()(boma, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+                }
+            }
+            if fighter_kind == *FIGHTER_KIND_CAPTAIN {
+                if [*FIGHTER_CAPTAIN_STATUS_KIND_SPECIAL_LW_END, *FIGHTER_CAPTAIN_STATUS_KIND_SPECIAL_LW_WALL_END].contains(&status_kind) {
+                    return original!()(boma, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+                }
+            }
+        }*/
+    }
+    original!()(boma, kind)
+}
+
+#[skyline::hook(replace=StatusModule::init_settings)]
+unsafe fn init_settings_hook(boma: &mut BattleObjectModuleAccessor, situation: smash::app::SituationKind, arg3: i32, arg4: u32,
+                             ground_cliff_check_kind: smash::app::GroundCliffCheckKind, arg6: bool,
+                             arg7: i32, arg8: i32, arg9: i32, arg10: i32) -> u64 {
+    let category = get_category(boma);
+    let fighter_kind = get_kind(boma);
+    let status_kind = StatusModule::status_kind(boma);
+    let situation_kind = StatusModule::situation_kind(boma);
+    //
+    // Call edge_slippoffs init_settings
+    let fix = init_settings_edges(boma, situation, arg3, arg4, ground_cliff_check_kind, arg6, arg7, arg8, arg9, arg10);
+
+    original!()(boma, situation, arg3, fix, ground_cliff_check_kind, arg6, arg7, arg8, arg9, arg10)
+}
+
+pub unsafe fn jumpCancelMove(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, fighter_kind: i32, cat1: i32, stick_value_y: f32) { //Jump cancel grab, usmash, etc.
+    if status_kind == *FIGHTER_STATUS_KIND_JUMP_SQUAT {
+        if ControlModule::check_button_trigger(boma, *CONTROL_PAD_BUTTON_GUARD) {
+            StatusModule::change_status_request_from_script(boma, *FIGHTER_STATUS_KIND_ESCAPE_AIR, true);
+        }
+    }
+}
+
 pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     JostleModule::set_team(fighter.module_accessor, 0);
     let module_accessor = &mut *fighter.module_accessor;
@@ -225,6 +364,21 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     let motion_kind = MotionModule::motion_kind(fighter.module_accessor);
     let curr_frame = MotionModule::frame(fighter.module_accessor);
 
+    //Held Buffer
+    let control_pad = [
+        *CONTROL_PAD_BUTTON_APPEAL_HI, *CONTROL_PAD_BUTTON_APPEAL_LW, *CONTROL_PAD_BUTTON_APPEAL_S_L, *CONTROL_PAD_BUTTON_APPEAL_S_R, *CONTROL_PAD_BUTTON_ATTACK, *CONTROL_PAD_BUTTON_ATTACK_RAW, *CONTROL_PAD_BUTTON_CATCH, *CONTROL_PAD_BUTTON_CSTICK_ON,
+        *CONTROL_PAD_BUTTON_FLICK_JUMP, *CONTROL_PAD_BUTTON_GUARD, *CONTROL_PAD_BUTTON_GUARD_HOLD, *CONTROL_PAD_BUTTON_INVALID, *CONTROL_PAD_BUTTON_JUMP, *CONTROL_PAD_BUTTON_JUMP_MINI, *CONTROL_PAD_BUTTON_SMASH, *CONTROL_PAD_BUTTON_SPECIAL, 
+        *CONTROL_PAD_BUTTON_SPECIAL_RAW, *CONTROL_PAD_BUTTON_SPECIAL_RAW2, *CONTROL_PAD_BUTTON_STOCK_SHARE, *CONTROL_PAD_BUTTON_TERM, *CONTROL_PAD_CLATTER_CAUSE_NONE, *CONTROL_PAD_CLATTER_FLOWER, *CONTROL_PAD_CLATTER_MAIN, *CONTROL_PAD_CLATTER_NONE,
+        *CONTROL_PAD_CLATTER_TERM, *CONTROL_PAD_STICK_REVERSE_ALL, *CONTROL_PAD_STICK_REVERSE_NONE, *CONTROL_PAD_STICK_REVERSE_X, *CONTROL_PAD_STICK_REVERSE_Y
+    ];
+    for i in control_pad {
+        if ControlModule::get_trigger_count(module_accessor, i as u8) > 15 && ControlModule::check_button_on(module_accessor, i)
+        && ![*FIGHTER_STATUS_KIND_GUARD, *FIGHTER_STATUS_KIND_GUARD_ON, *FIGHTER_STATUS_KIND_GUARD_DAMAGE, *FIGHTER_STATUS_KIND_GUARD_OFF].contains(&status_kind) {
+            ControlModule::reset_trigger(module_accessor);
+            ControlModule::clear_command(module_accessor, true);
+        }
+    }
+
     shieldStops(module_accessor, status_kind, cat1);
     shieldDrops(module_accessor, status_kind, cat2);
     dashPlatformDrop(module_accessor, status_kind, situation_kind, stick_value_y, stick_value_x);
@@ -232,6 +386,7 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     fixbackdash(module_accessor, status_kind, motion_kind, cat1, stick_value_y);
     lagCanceled(module_accessor, status_kind);
     meleeECBs(module_accessor, status_kind, situation_kind, fighter_kind);
+    jumpCancelMove(module_accessor, status_kind, fighter_kind, cat1, stick_value_y);
 }
 
 pub fn install() {
@@ -245,5 +400,8 @@ pub fn install() {
     skyline::patching::Patch::in_text(0x6be644).data(0x52800040);
 
     skyline::install_hook!(get_param_float_hook);
-    
+    skyline::install_hook!(init_settings_hook);
+    skyline::install_hook!(correct_hook);
+
+    jumpsquat::install();
 }

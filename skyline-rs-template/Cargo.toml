@@ -17,6 +17,10 @@ smash_script = { git = "https://github.com/blu-dev/smash-script.git", branch = "
 smashline = { git = "https://github.com/hdr-development/smashline.git" }
 smash_singletons = { git = "https://github.com/WuBoytH/smash_singletons.git" }
 
+dynamic = { path = "dynamic" }
+hdr-macros = { path = "hdr-macros" }
+utils = { path = "utils" }
+
 [profile.dev]
 panic = "abort"
 

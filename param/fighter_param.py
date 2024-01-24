@@ -9,6 +9,14 @@ mods = {
     },
     hash("fighter_kind_fox"): {
         hash("run_speed_max"): 2.4,
+        hash("air_accel_y"): 0.23,
+        hash("damage_fly_top_air_accel_y"): 0.23,
+        hash("landing_attack_air_frame_lw"): 9,
+        hash("landing_attack_air_frame_f"): 11,
+        hash("landing_attack_air_frame_hi"): 9,
+    },
+    hash("fighter_kind_mario"): {
+        hash("landing_attack_air_frame_lw"): 13,
     },
 }
 

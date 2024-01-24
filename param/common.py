@@ -3,8 +3,8 @@ from pyprc import *
 common = param("common_vanilla.prc")
 
 #Buffer
-#common[hash("precede")].value = 5
-#common[hash("precede_extension")].value = 0
+common[hash("precede")].value = 6
+common[hash("precede_extension")].value = 0
 
 #Dash shit
 common[hash("turn_dash_frame")].value = -1

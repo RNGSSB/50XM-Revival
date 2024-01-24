@@ -25,8 +25,7 @@ for fighter in table:
     fighter[hash("escape_air_slide_penalty_speed")].value = 2.6
     fighter[hash("escape_air_slide_penalty_distance")].value = 25
     fighter[hash("escape_air_slide_end_speed")].value = 0
-    fighter[hash("landing_frame_escape_air_slide_max")].value = 10
-    #fighter[hash("escape_air_slide_cancel_frame")].value = 13
+    fighter[hash("landing_frame_escape_air_slide_max")].value = 13
 
 fighter_param.save("fighter_param_motion.prc")
 
