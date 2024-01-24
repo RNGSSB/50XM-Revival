@@ -2,33 +2,18 @@
 use super::*;
 use globals::*;
 
-use smash::{self, hash40, app, app::lua_bind::*, lib::*, lib::lua_const::*, lua2cpp::*, phx::*};
-use smash_script::{self, *, macros::*};
-use smashline::*;
-
-use skyline::install_hooks;
-
-use utils::{
-    *,
-    util::*,
-    ext::*,
-    consts::*,
-};
-
-
-
 // This file contains code for wavedashing out of jumpsquat, fullhop buffered aerials/attack canceling
 
 pub fn install() {
     skyline::nro::add_hook(nro_hook);
-    install_status_scripts!(
+    smashline::install_status_scripts!(
         //status_pre_JumpSquat,
         status_JumpSquat,
         status_end_JumpSquat,
         status_exec_JumpSquat
     );
 
-    install_hooks!(
+    /*install_hooks!(
         //status_pre_JumpSquat_param,
         status_JumpSquat_Main,
         status_JumpSquat_common,
@@ -37,7 +22,9 @@ pub fn install() {
         sub_jump_squat_uniq_check_sub,
         sub_jump_squat_uniq_check_sub_mini_attack,
         sub_status_JumpSquat_check_stick_lr_update
-    );
+    );*/
+    Agent::new("common")
+    .status(Pre, *FIGHTER_STATUS_KIND_GLIDE_START, status_glidestart_pre)
     
 }
 

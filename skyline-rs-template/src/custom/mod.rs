@@ -8,13 +8,24 @@ use smash::app::utility::*;
 use smash::lua2cpp::*;
 use smash::lib::lua_const::*;
 use smash::phx::*;
-use smash::app::GroundCorrectKind;
+use smash::app::*;
+use smash::app;
 use skyline::nn::ro::LookupSymbol;
 use smashline::*;
 use super::*;
 use smash::app::FighterKineticEnergyGravity;
-use smash_script::lua_args;
+use smash_script::*;
 use smash::app::sv_animcmd::*;
+use smashline::Pre;
+
+use utils::{
+    *,
+    util::*,
+    ext::*,
+    consts::*,
+};
+
+use skyline::install_hooks;
 
 static mut LAGCANCELED: [bool; 9] = [false; 9];
 static mut LEDGE_POS: [Vector3f; 9] = [smash::phx::Vector3f { x: 0.0, y: 0.0, z: 0.0}; 9];

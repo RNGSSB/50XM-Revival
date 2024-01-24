@@ -1,5 +1,7 @@
 #![feature(seek_stream_len)]
+#![allow(warnings)] 
 #[macro_use]
+
 extern crate lazy_static;
 
 pub mod offsets;

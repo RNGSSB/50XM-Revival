@@ -6,6 +6,8 @@
     unused_macros
 )]
 
+#![allow(warnings)] 
+
 mod mario;
 mod fox;
 mod falcon;
