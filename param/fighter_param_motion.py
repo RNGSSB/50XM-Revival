@@ -20,9 +20,9 @@ for fighter in table:
     fighter[hash("escape_air_slide_penalty_hit_normal_frame")].value = 24
     fighter[hash("escape_air_slide_back_distance")].value = 0
     fighter[hash("escape_air_slide_back_end_frame")].value = 0
-    fighter[hash("escape_air_slide_speed")].value = 2.6
+    fighter[hash("escape_air_slide_speed")].value = 2.4
     fighter[hash("escape_air_slide_distance")].value = 25
-    fighter[hash("escape_air_slide_penalty_speed")].value = 2.6
+    fighter[hash("escape_air_slide_penalty_speed")].value = 2.4
     fighter[hash("escape_air_slide_penalty_distance")].value = 25
     fighter[hash("escape_air_slide_end_speed")].value = 0
     fighter[hash("landing_frame_escape_air_slide_max")].value = 13

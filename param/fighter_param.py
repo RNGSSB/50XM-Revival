@@ -12,7 +12,7 @@ mods = {
         hash("air_accel_y"): 0.23,
         hash("damage_fly_top_air_accel_y"): 0.23,
         hash("landing_attack_air_frame_lw"): 9,
-        hash("landing_attack_air_frame_f"): 11,
+        hash("landing_attack_air_frame_f"): 8,
         hash("landing_attack_air_frame_hi"): 9,
     },
     hash("fighter_kind_mario"): {
