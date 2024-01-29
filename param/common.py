@@ -80,7 +80,7 @@ common[hash("shield_just_frame")].value = 5
 common[hash("shield_setoff_catch_frame")].value = 0
 
 #Re grab timer, og is 60
-common[hash("invalid_capture_frame")].value = 35
+common[hash("invalid_capture_frame")].value = 40
 
 common.save("common.prc")
 

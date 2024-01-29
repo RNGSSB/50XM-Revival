@@ -18,6 +18,9 @@ mods = {
     hash("fighter_kind_mario"): {
         hash("landing_attack_air_frame_lw"): 13,
     },
+    hash("fighter_kind_sheik"): {
+        hash("landing_attack_air_frame_lw"): 10,
+    },
 }
 
 

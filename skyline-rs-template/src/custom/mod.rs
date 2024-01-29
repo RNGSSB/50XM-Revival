@@ -361,6 +361,61 @@ pub unsafe fn jumpCancelMove(boma: &mut smash::app::BattleObjectModuleAccessor, 
     }
 }
 
+#[skyline::hook(replace = smash::app::lua_bind::GroundModule::entry_cliff)]
+
+pub unsafe fn entry_cliff_hook(boma: &mut smash::app::BattleObjectModuleAccessor) -> u64 {
+    let entry_id = get_player_number(boma);
+    LEDGE_POS[entry_id] = GroundModule::hang_cliff_pos_3f(boma);
+    original!()(boma)
+}
+
+#[skyline::hook(replace = smash::app::lua_bind::GroundModule::leave_cliff)]
+
+pub unsafe fn leave_cliff_hook(boma: &mut smash::app::BattleObjectModuleAccessor) -> u64 {
+    let entry_id = get_player_number(boma);
+    LEDGE_POS[entry_id] = smash::phx::Vector3f { x: 0.0, y: 0.0, z:0.0 };
+    original!()(boma)
+}
+
+#[skyline::hook(replace = smash::app::lua_bind::GroundModule::can_entry_cliff)]
+
+pub unsafe fn can_entry_cliff_hook(boma: &mut smash::app::BattleObjectModuleAccessor) -> u64 {
+    let pos = GroundModule::hang_cliff_pos_3f(boma);
+    let entry_id = get_player_number(boma);
+    let status_kind = StatusModule::status_kind(boma);
+    let fighter_kind = get_kind(boma);
+    let motion_kind = MotionModule::motion_kind(boma);
+    if fighter_kind == *FIGHTER_KIND_KOOPAJR {
+        if KineticModule::get_sum_speed_y(boma, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN) > WorkModule::get_param_float(boma, hash40("air_speed_y_stable"), 0) {
+            return 0;
+        }
+    }
+    if KineticModule::get_sum_speed_y(boma, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN) > 0.0 { //Melee style sweetspots
+        if ![*FIGHTER_KIND_PFUSHIGISOU, *FIGHTER_KIND_TANTAN, *FIGHTER_KIND_MASTER].contains(&fighter_kind) && status_kind != *FIGHTER_STATUS_KIND_AIR_LASSO && status_kind != 248 &&
+        (fighter_kind != *FIGHTER_KIND_JACK || ![*FIGHTER_JACK_STATUS_KIND_SPECIAL_HI_CUT, *FIGHTER_JACK_STATUS_KIND_SPECIAL_HI_THROW, *FIGHTER_STATUS_KIND_SPECIAL_HI].contains(&status_kind)) &&
+        (fighter_kind != *FIGHTER_KIND_SHIZUE || ![*FIGHTER_STATUS_KIND_SPECIAL_S, *FIGHTER_SHIZUE_STATUS_KIND_SPECIAL_S_START, *FIGHTER_SHIZUE_STATUS_KIND_SPECIAL_S_THROW].contains(&status_kind)) &&
+        (![*FIGHTER_KIND_SIMON, *FIGHTER_KIND_RICHTER].contains(&fighter_kind) || status_kind != *FIGHTER_STATUS_KIND_ATTACK_AIR)  {
+            return 0 as u64;
+        }
+    }
+    if (status_kind != *FIGHTER_STATUS_KIND_FALL_AERIAL && status_kind != *FIGHTER_STATUS_KIND_JUMP_AERIAL && status_kind != *FIGHTER_STATUS_KIND_FALL && 
+    status_kind != *FIGHTER_STATUS_KIND_FLY && status_kind != *FIGHTER_STATUS_KIND_AIR_LASSO && ![*FIGHTER_KIND_PFUSHIGISOU, *FIGHTER_KIND_MASTER, *FIGHTER_KIND_TANTAN].contains(&fighter_kind) && (fighter_kind != *FIGHTER_KIND_JACK ||  
+        ![*FIGHTER_JACK_STATUS_KIND_SPECIAL_HI_CUT, *FIGHTER_JACK_STATUS_KIND_SPECIAL_HI_THROW, *FIGHTER_STATUS_KIND_SPECIAL_HI].contains(&status_kind)) &&
+        (![*FIGHTER_KIND_SIMON, *FIGHTER_KIND_RICHTER].contains(&fighter_kind) || status_kind != *FIGHTER_STATUS_KIND_ATTACK_AIR)) || motion_kind == 61345827621 { //Edgehog/trump
+        for i in 0..9 {
+            i as usize;
+            if i == entry_id || LEDGE_POS[i].x == 0.0 {
+                continue;
+            }
+
+            if pos.x == LEDGE_POS[i].x && pos.y == LEDGE_POS[i].y {
+                return 0 as u64;
+            }
+        }
+    }
+    original!()(boma)
+}
+
 pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     JostleModule::set_team(fighter.module_accessor, 0);
     let module_accessor = &mut *fighter.module_accessor;
@@ -413,6 +468,9 @@ pub fn install() {
     skyline::install_hook!(get_param_float_hook);
     skyline::install_hook!(init_settings_hook);
     skyline::install_hook!(correct_hook);
+    skyline::install_hook!(entry_cliff_hook);
+    skyline::install_hook!(leave_cliff_hook);
+    skyline::install_hook!(can_entry_cliff_hook);
 
     jumpsquat::install();
 }
