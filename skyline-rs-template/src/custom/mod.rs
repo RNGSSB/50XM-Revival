@@ -416,6 +416,43 @@ pub unsafe fn can_entry_cliff_hook(boma: &mut smash::app::BattleObjectModuleAcce
     original!()(boma)
 }
 
+extern "C" {
+    #[link_name = "\u{1}_ZN3app11FighterUtil30is_valid_just_shield_reflectorERNS_26BattleObjectModuleAccessorE"]
+    fn is_valid_just_shield_reflector(boma: &mut smash::app::BattleObjectModuleAccessor) -> bool;
+}
+
+#[skyline::hook(replace=is_valid_just_shield_reflector)]
+unsafe fn is_valid_just_shield_reflector_hook(boma: &mut smash::app::BattleObjectModuleAccessor) -> bool {
+    return true;
+}
+
+// These 2 hooks prevent buffered nair after inputting C-stick on first few frames of jumpsquat
+// Both found in ControlModule::exec_command
+#[skyline::hook(offset = 0x6be610)]
+unsafe fn set_attack_air_stick_hook(control_module: u64, arg: u32) {
+    // This check passes on the frame FighterControlModuleImpl::reserve_on_attack_button is called
+    // Only happens during jumpsquat currently
+    let boma = *(control_module as *mut *mut BattleObjectModuleAccessor).add(1);
+    if *((control_module + 0x645) as *const bool)
+    && !VarModule::is_flag((*boma).object(), vars::common::instance::IS_ATTACK_CANCEL)
+    && !VarModule::is_flag((*boma).object(), vars::common::status::CSTICK_IRAR) {
+        return;
+    }
+    call_original!(control_module, arg);
+}
+#[skyline::hook(offset = 0x6bd6a4, inline)]
+unsafe fn exec_command_reset_attack_air_kind_hook(ctx: &mut skyline::hooks::InlineCtx) {
+    let control_module = *ctx.registers[21].x.as_ref();
+    let boma = *(control_module as *mut *mut BattleObjectModuleAccessor).add(1);
+    // For some reason, the game resets your attack_air_kind value every frame
+    // even though it resets as soon as you perform an aerial attack
+    // We don't want this to reset while in jumpsquat
+    // to allow the game to use your initial C-stick input during jumpsquat for your attack_air_kind
+    if !(*boma).is_status(*FIGHTER_STATUS_KIND_JUMP_SQUAT) {
+        ControlModule::reset_attack_air_kind(boma);
+    }
+}
+
 pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     JostleModule::set_team(fighter.module_accessor, 0);
     let module_accessor = &mut *fighter.module_accessor;
@@ -465,12 +502,18 @@ pub fn install() {
     // Prevents buffered C-stick aerials from triggering nair
     skyline::patching::Patch::in_text(0x6be644).data(0x52800040);
 
+    // Prevents attack_air_kind from resetting every frame
+    // Found in ControlModule::exec_command
+    skyline::patching::Patch::in_text(0x6bd6a4).nop();
+
     skyline::install_hook!(get_param_float_hook);
     skyline::install_hook!(init_settings_hook);
     skyline::install_hook!(correct_hook);
     skyline::install_hook!(entry_cliff_hook);
     skyline::install_hook!(leave_cliff_hook);
     skyline::install_hook!(can_entry_cliff_hook);
-
+    skyline::install_hook!(is_valid_just_shield_reflector_hook);
+    skyline::install_hook!(set_attack_air_stick_hook); 
+    skyline::install_hook!(exec_command_reset_attack_air_kind_hook); 
     jumpsquat::install();
 }
