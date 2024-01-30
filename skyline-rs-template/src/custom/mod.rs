@@ -426,20 +426,6 @@ unsafe fn is_valid_just_shield_reflector_hook(boma: &mut smash::app::BattleObjec
     return true;
 }
 
-// These 2 hooks prevent buffered nair after inputting C-stick on first few frames of jumpsquat
-// Both found in ControlModule::exec_command
-#[skyline::hook(offset = 0x6be610)]
-unsafe fn set_attack_air_stick_hook(control_module: u64, arg: u32) {
-    // This check passes on the frame FighterControlModuleImpl::reserve_on_attack_button is called
-    // Only happens during jumpsquat currently
-    let boma = *(control_module as *mut *mut BattleObjectModuleAccessor).add(1);
-    if *((control_module + 0x645) as *const bool)
-    && !VarModule::is_flag((*boma).object(), vars::common::instance::IS_ATTACK_CANCEL)
-    && !VarModule::is_flag((*boma).object(), vars::common::status::CSTICK_IRAR) {
-        return;
-    }
-    call_original!(control_module, arg);
-}
 #[skyline::hook(offset = 0x6bd6a4, inline)]
 unsafe fn exec_command_reset_attack_air_kind_hook(ctx: &mut skyline::hooks::InlineCtx) {
     let control_module = *ctx.registers[21].x.as_ref();
@@ -476,7 +462,7 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     ];
     for i in control_pad {
         if ControlModule::get_trigger_count(module_accessor, i as u8) > 15 && ControlModule::check_button_on(module_accessor, i)
-        && ![*FIGHTER_STATUS_KIND_GUARD, *FIGHTER_STATUS_KIND_GUARD_ON, *FIGHTER_STATUS_KIND_GUARD_DAMAGE, *FIGHTER_STATUS_KIND_GUARD_OFF].contains(&status_kind) {
+        && ![*FIGHTER_STATUS_KIND_GUARD, *FIGHTER_STATUS_KIND_GUARD_ON, *FIGHTER_STATUS_KIND_GUARD_DAMAGE, *FIGHTER_STATUS_KIND_GUARD_OFF, *FIGHTER_STATUS_KIND_JUMP_SQUAT].contains(&status_kind) {
             ControlModule::reset_trigger(module_accessor);
             ControlModule::clear_command(module_accessor, true);
         }
@@ -513,7 +499,6 @@ pub fn install() {
     skyline::install_hook!(leave_cliff_hook);
     skyline::install_hook!(can_entry_cliff_hook);
     skyline::install_hook!(is_valid_just_shield_reflector_hook);
-    skyline::install_hook!(set_attack_air_stick_hook); 
     skyline::install_hook!(exec_command_reset_attack_air_kind_hook); 
     jumpsquat::install();
 }
