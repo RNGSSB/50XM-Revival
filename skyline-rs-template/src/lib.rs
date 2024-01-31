@@ -15,6 +15,8 @@ mod sheik;
 mod marth;
 mod roy;
 mod wolf;
+mod mythra;
+mod pyra;
 mod custom;
 
 #[skyline::main(name = "smashline_test")]
@@ -26,5 +28,7 @@ pub fn main() {
     roy::install();
     sheik::install();
     wolf::install();
+    mythra::install();
+    pyra::install();
     custom::install();
 }

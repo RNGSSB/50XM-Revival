@@ -23,6 +23,8 @@ mods = {
     },
     hash("fighter_kind_elight"): {
        hash("dash_speed"): 2.25,
+       hash("weight"): 82,
+       hash("landing_attack_air_frame_n"): 9,
     },
 }
 
