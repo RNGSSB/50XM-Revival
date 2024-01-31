@@ -4,13 +4,13 @@ fighter_param = param("fighter_param_vanilla.prc")
 table = fighter_param[hash("fighter_param_table")]
 
 mods = {
-    hash("fighter_kind_gaogaen"): {
-        hash("run_speed_max"): 1.35,
-    },
     hash("fighter_kind_fox"): {
         hash("run_speed_max"): 2.4,
         hash("air_accel_y"): 0.23,
+        hash("air_speed_y_stable"): 2.8,
+        hash("damage_fly_top_speed_y_stable"): 2.8,
         hash("damage_fly_top_air_accel_y"): 0.23,
+        hash("dive_speed_y"): 3.4,
         hash("landing_attack_air_frame_lw"): 9,
         hash("landing_attack_air_frame_f"): 8,
         hash("landing_attack_air_frame_hi"): 9,

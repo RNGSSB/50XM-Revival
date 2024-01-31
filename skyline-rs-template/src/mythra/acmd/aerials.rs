@@ -59,7 +59,7 @@ unsafe extern "C" fn game_attackairhi(agent: &mut L2CAgentBase) {
             WorkModule::on_flag(agent.module_accessor, *FIGHTER_ELIGHT_INSTANCE_WORK_ID_FLAG_ADD_PARTIAL_MTION_SWORD_WHEN_CHANGEING);
         }
     }
-    frame(agent.lua_state_agent, 25.0);
+    frame(agent.lua_state_agent, 29.0);
     if macros::is_excute(agent) {
         WorkModule::off_flag(agent.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
     }
