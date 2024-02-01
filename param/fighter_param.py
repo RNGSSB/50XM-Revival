@@ -26,6 +26,10 @@ mods = {
        hash("weight"): 82,
        hash("landing_attack_air_frame_n"): 9,
     },
+    hash("fighter_kind_cloud"): {
+       hash("landing_attack_air_frame_f"): 13,
+       hash("landing_attack_air_frame_b"): 11,
+    },
 }
 
 
