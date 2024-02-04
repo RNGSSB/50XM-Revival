@@ -15,8 +15,8 @@ battleobject[hash("damage_level2")].value = 21 #Value 21
 battleobject[hash("damage_level3")].value = 32 #Value 32
 
 #Balloon Knockback
-battleobject[hash("damage_fly_speed_up_reaction_frame_min")].value = 999 #30
-battleobject[hash("damage_fly_speed_up_reaction_frame_max")].value = 999 #80
+battleobject[hash("damage_fly_speed_up_reaction_frame_min")].value = 50 #30
+battleobject[hash("damage_fly_speed_up_reaction_frame_max")].value = 100 #80
 
 #Sakurai Angle
 battleobject[hash("damage_angle_air")].value = 0.785398
