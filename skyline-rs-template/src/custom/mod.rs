@@ -30,9 +30,28 @@ use skyline::install_hooks;
 static mut LAGCANCELED: [bool; 9] = [false; 9];
 static mut LEDGE_POS: [Vector3f; 9] = [smash::phx::Vector3f { x: 0.0, y: 0.0, z: 0.0}; 9];
 static mut ECB_Y_OFFSETS: [f32; 9] = [0.0; 9];
+static mut CURRENTMOMENTUM: [f32; 9] = [0.0; 9];
 
 mod jumpsquat;
 
+
+pub unsafe fn returnSmall(arg1: f32, arg2: f32) -> f32{
+    if arg1 < arg2 {
+        return arg1;
+    }
+    else {
+        return arg2;
+    }
+}
+
+pub unsafe fn returnLarge(arg1: f32, arg2: f32) -> f32{
+    if arg1 > arg2 {
+        return arg1;
+    }
+    else {
+        return arg2;
+    }
+}
 
 pub unsafe fn get_player_number(boma: &mut smash::app::BattleObjectModuleAccessor) -> usize {
     return WorkModule::get_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
@@ -440,8 +459,113 @@ unsafe fn exec_command_reset_attack_air_kind_hook(ctx: &mut skyline::hooks::Inli
     }
 }
 
+pub unsafe fn calcMomentum(boma: &mut smash::app::BattleObjectModuleAccessor) -> f32 {
+    let jump_speed_x = WorkModule::get_param_float(boma, hash40("jump_speed_x"), 0);
+    let jump_speed_x_mul = WorkModule::get_param_float(boma, hash40("jump_speed_x_mul"), 0);
+    let stick_x = ControlModule::get_stick_x(boma);
+    let x_vel = KineticModule::get_sum_speed_x(boma, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+    let jump_speed_x_max = WorkModule::get_param_float(boma, hash40("jump_speed_x_max"), 0);
+    let calcJumpSpeed = (jump_speed_x * stick_x) + (jump_speed_x_mul * x_vel);
+    let mut jumpSpeedClamped = 0.0;
+    if x_vel < 0.0 {
+        jumpSpeedClamped = returnLarge(calcJumpSpeed, -1.0 * jump_speed_x_max);
+    }
+    else {
+        jumpSpeedClamped = returnSmall(calcJumpSpeed, jump_speed_x_max);
+    }
+    jumpSpeedClamped
+}
+
+#[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_sub_attack_air_common)]
+pub unsafe fn status_attack_air_hook(fighter: &mut L2CFighterCommon, param_1: L2CValue) {
+    let boma = smash::app::sv_system::battle_object_module_accessor(fighter.lua_state_agent);
+    let mut l2c_agent = L2CAgent::new(fighter.lua_state_agent);
+    let is_speed_backward = KineticModule::get_sum_speed_x(boma, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN) * PostureModule::lr(boma) < 0.0;
+    let prev_status_check = [*FIGHTER_STATUS_KIND_FALL, *FIGHTER_STATUS_KIND_JUMP, *FIGHTER_STATUS_KIND_JUMP_SQUAT].contains(&StatusModule::prev_status_kind(boma, 0));    
+    let mut new_speed = CURRENTMOMENTUM[get_player_number(boma)];
+
+
+        /*      Shorthop aerial macro and "bair stick flick" fix     */
+    if WorkModule::get_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_FRAME_IN_AIR) <= 1 && 
+        StatusModule::prev_status_kind(boma, 1) == *FIGHTER_STATUS_KIND_JUMP_SQUAT && !is_speed_backward { //if you used the shorthop aerial macro
+        new_speed = calcMomentum(boma);
+    }
+
+    if prev_status_check {
+        l2c_agent.clear_lua_stack();
+        l2c_agent.push_lua_stack(&mut L2CValue::new_int(*FIGHTER_KINETIC_ENERGY_ID_CONTROL as u64));
+        l2c_agent.push_lua_stack(&mut L2CValue::new_num(new_speed));
+        smash::app::sv_kinetic_energy::set_speed(fighter.lua_state_agent);
+    }
+
+    original!()(fighter, param_1)
+}
+
+pub unsafe fn additionalTransfer(lua_state: u64, l2c_agent: &mut L2CAgent, boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, situation_kind: i32, fighter_kind: i32) {
+    if [*FIGHTER_STATUS_KIND_JUMP_SQUAT, *FIGHTER_STATUS_KIND_JUMP, *FIGHTER_STATUS_KIND_FALL].contains(&status_kind) {
+        CURRENTMOMENTUM[get_player_number(boma)] = KineticModule::get_sum_speed_x(boma, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN); 
+    }
+
+            /*      ADDITIONAL MOVES THAT SHOULD CONSERVE MOMENTUM       */
+    let mut should_conserve_momentum = false;
+    
+    if situation_kind == *SITUATION_KIND_AIR && MotionModule::frame(boma) <= 1.0 {
+
+        if [*FIGHTER_KIND_CAPTAIN, *FIGHTER_KIND_MARIO, *FIGHTER_KIND_LUIGI, *FIGHTER_KIND_FOX, *FIGHTER_KIND_FALCO, *FIGHTER_KIND_WOLF, *FIGHTER_KIND_JACK, 
+        *FIGHTER_KIND_CLOUD, *FIGHTER_KIND_EDGE, *FIGHTER_KIND_LINK, *FIGHTER_KIND_GEKKOUGA, *FIGHTER_KIND_PIKACHU, *FIGHTER_KIND_SZEROSUIT, *FIGHTER_KIND_DIDDY,
+        *FIGHTER_KIND_ROY, *FIGHTER_KIND_MARTH, *FIGHTER_KIND_WARIO, *FIGHTER_KIND_SAMUS, *FIGHTER_KIND_SHEIK, *FIGHTER_KIND_REFLET, *FIGHTER_KIND_ELIGHT,
+        *FIGHTER_KIND_LUCARIO, *FIGHTER_KIND_MEWTWO, *FIGHTER_KIND_KOOPA, *FIGHTER_KIND_RIDLEY, *FIGHTER_KIND_INKLING, *FIGHTER_KIND_SNAKE, *FIGHTER_KIND_KROOL]
+            .contains(&fighter_kind) && status_kind == *FIGHTER_STATUS_KIND_SPECIAL_N { //put any fighter here whose neutral special should conserve momentum
+                should_conserve_momentum = true; 
+        }
+
+        if should_conserve_momentum && KineticModule::get_sum_speed_x(boma, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN).abs() > 0.1 {
+            l2c_agent.clear_lua_stack();
+            l2c_agent.push_lua_stack(&mut L2CValue::new_int(*FIGHTER_KINETIC_ENERGY_ID_CONTROL as u64));
+            l2c_agent.push_lua_stack(&mut L2CValue::new_num(CURRENTMOMENTUM[get_player_number(boma)]));
+            smash::app::sv_kinetic_energy::set_speed(lua_state);
+        }
+
+    }
+}
+
+
+#[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_status_Jump_sub)]
+pub unsafe fn status_jump_sub_hook(fighter: &mut L2CFighterCommon, param_2: L2CValue, param_3: L2CValue) -> L2CValue {
+    let boma = smash::app::sv_system::battle_object_module_accessor(fighter.lua_state_agent);
+    let mut l2c_agent = L2CAgent::new(fighter.lua_state_agent);
+
+    l2c_agent.clear_lua_stack();
+    l2c_agent.push_lua_stack(&mut L2CValue::new_int(*FIGHTER_KINETIC_ENERGY_ID_CONTROL as u64));
+    l2c_agent.push_lua_stack(&mut L2CValue::new_num(calcMomentum(boma)));
+    smash::app::sv_kinetic_energy::set_speed(fighter.lua_state_agent);
+
+
+    original!()(fighter, param_2, param_3)
+}
+
+#[skyline::hook(replace = KineticModule::change_kinetic)]
+pub unsafe fn change_kinetic_hook(boma: &mut smash::app::BattleObjectModuleAccessor, kinetic_type: i32) -> Option<i32> { //spacie laser momentum conservation
+    let mut kinetic_type_new = kinetic_type;
+    let status_kind = StatusModule::status_kind(boma);
+    let fighter_kind = get_kind(boma);
+    let mut should_change_kinetic = false;
+
+    if [*FIGHTER_KIND_FALCO, *FIGHTER_KIND_FOX, *FIGHTER_KIND_WOLF].contains(&fighter_kind) && status_kind == 446 /* laser status */ { 
+        should_change_kinetic = true;
+    }
+
+    if [*FIGHTER_KINETIC_TYPE_FALL].contains(&kinetic_type_new) && should_change_kinetic {
+        kinetic_type_new = -1;
+    }     
+
+    original!()(boma, kinetic_type_new)
+}
+
 pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     JostleModule::set_team(fighter.module_accessor, 0);
+    let lua_state = fighter.lua_state_agent;
+    let mut l2c_agent = L2CAgent::new(lua_state);
     let module_accessor = &mut *fighter.module_accessor;
     let situation_kind = StatusModule::situation_kind(fighter.module_accessor);
     let status_kind = StatusModule::status_kind(fighter.module_accessor);
@@ -477,6 +601,19 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     lagCanceled(module_accessor, status_kind);
     meleeECBs(module_accessor, status_kind, situation_kind, fighter_kind);
     jumpCancelMove(module_accessor, status_kind, fighter_kind, cat1, stick_value_y);
+    additionalTransfer(lua_state, &mut l2c_agent, module_accessor, status_kind, situation_kind, fighter_kind);
+}
+
+fn nro_main(nro: &skyline::nro::NroInfo) {
+    match nro.name {
+        "common" => {
+            skyline::install_hooks!(
+                status_jump_sub_hook,
+                status_attack_air_hook
+            );
+        }
+        _ => (),
+    }
 }
 
 pub fn install() {
@@ -501,5 +638,7 @@ pub fn install() {
     skyline::install_hook!(can_entry_cliff_hook);
     skyline::install_hook!(is_valid_just_shield_reflector_hook);
     skyline::install_hook!(exec_command_reset_attack_air_kind_hook); 
+    skyline::install_hook!(change_kinetic_hook);
     jumpsquat::install();
+    nro::add_hook(nro_main).unwrap();
 }
