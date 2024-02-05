@@ -30,6 +30,12 @@ mods = {
        hash("landing_attack_air_frame_f"): 13,
        hash("landing_attack_air_frame_b"): 11,
     },
+    hash("fighter_kind_ganon"): {
+       hash("run_speed_max"): 1.34,
+       hash("ground_brake"): 0.07
+       hash("landing_attack_air_frame_b"): 11,
+       hash("landing_attack_air_frame_n"): 8,
+    },
 }
 
 

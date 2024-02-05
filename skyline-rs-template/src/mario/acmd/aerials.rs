@@ -35,9 +35,9 @@ unsafe extern "C" fn mario_attackairf(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
     }
-    frame(agent.lua_state_agent, 45.0);
-    if macros::is_excute(agent) {
-            CancelModule::enable_cancel(agent.module_accessor);
+    frame(fighter.lua_state_agent, 45.0);
+    if macros::is_excute(fighter) {
+            CancelModule::enable_cancel(fighter.module_accessor);
     }
 }
 
