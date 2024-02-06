@@ -88,5 +88,8 @@ common[hash("invalid_capture_frame")].value = 60
 #Shield Drop Lag
 common[hash("guard_off_cancel_frame")].value = 7
 
+#Knockback Bounce Min Speed
+common[hash("damage_fly_reflect_d_speed")].value = 5.0 #Default 0.8
+
 common.save("common.prc")
 

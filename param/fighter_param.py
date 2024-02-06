@@ -5,7 +5,7 @@ table = fighter_param[hash("fighter_param_table")]
 
 mods = {
     hash("fighter_kind_fox"): {
-        hash("run_speed_max"): 2.4,
+        hash("dash_speed"): 2.4,
         hash("air_accel_y"): 0.23,
         hash("air_speed_y_stable"): 2.8,
         hash("damage_fly_top_speed_y_stable"): 2.8,
@@ -30,11 +30,14 @@ mods = {
        hash("landing_attack_air_frame_f"): 13,
        hash("landing_attack_air_frame_b"): 11,
     },
-    hash("fighter_kind_ganon"): {
-       hash("run_speed_max"): 1.34,
-       hash("ground_brake"): 0.07
-       hash("landing_attack_air_frame_b"): 11,
+    hash("fighter_kind_captain"): {
+       hash("landing_attack_air_frame_f"): 9,
+    },
+    hash("fighter_kind_gaogaen"): {
+       hash("run_speed_max"): 1.18,
+       hash("jump_squat_frame"): 4,
        hash("landing_attack_air_frame_n"): 8,
+       hash("landing_attack_air_frame_lw"): 13,
     },
 }
 
