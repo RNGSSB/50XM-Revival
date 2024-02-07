@@ -39,6 +39,17 @@ mods = {
        hash("landing_attack_air_frame_n"): 8,
        hash("landing_attack_air_frame_lw"): 13,
     },
+    hash("fighter_kind_edge"): {
+       hash("jump_squat_frame"): 4,
+       hash("landing_attack_air_frame_f"): 9,
+       hash("landing_attack_air_frame_b"): 11,
+       hash("landing_attack_air_frame_hi"): 16,
+       hash("landing_attack_air_frame_lw"): 21,
+    },
+    hash("fighter_kind_samus"): {
+       hash("landing_attack_air_frame_b"): 9,
+       hash("landing_attack_air_frame_hi"): 10,
+    },
 }
 
 
@@ -75,6 +86,7 @@ for fighter in table:
     fighter[hash("mini_jump_y")].value = shorthop
     fighter[hash("run_speed_max")].value = runspeed
     fighter[hash("air_speed_x_stable")].value = airspeed
+    fighter[hash("wall_jump_type")].value = True
     
     
     if fighter_name in mods:

@@ -89,7 +89,20 @@ common[hash("invalid_capture_frame")].value = 60
 common[hash("guard_off_cancel_frame")].value = 7
 
 #Knockback Bounce Min Speed
-common[hash("damage_fly_reflect_d_speed")].value = 5.0 #Default 0.8
+common[hash("damage_fly_reflect_d_speed")].value = 0.8 #Default 0.8 #5.0 works fine for something like Melee Fox Down Throw
+
+#Zair Landing Motion Rate
+common[hash("landing_air_lasso_motion_rate")].value = 8 #8 default
+
+#Zair Landing Frames
+common[hash("air_lasso_landing_frame")].value = 30 # 30 default
+
+#Ledge Regrab Amounts
+common[hash("air_lasso_catch_num")].value = 999
+common[hash("cliff_max_count")].value = 999
+
+#Ledge Jump Lag Frames
+common[hash("cliff_jump_disable_attack_frame")].value = 4 #2 Default
 
 common.save("common.prc")
 
