@@ -104,5 +104,8 @@ common[hash("cliff_max_count")].value = 999
 #Ledge Jump Lag Frames
 common[hash("cliff_jump_disable_attack_frame")].value = 4 #2 Default
 
+#Platform Drop Speed???
+common[hash("pass_speed_y")].value = -0.5 #default -0.5
+
 common.save("common.prc")
 

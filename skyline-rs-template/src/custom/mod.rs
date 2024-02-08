@@ -150,6 +150,16 @@ pub unsafe fn shieldDrops(boma: &mut smash::app::BattleObjectModuleAccessor, sta
             }
         }
     }
+    
+    if status_kind == *FIGHTER_STATUS_KIND_JUMP || status_kind == *FIGHTER_STATUS_KIND_JUMP_AERIAL ||
+    status_kind == *FIGHTER_STATUS_KIND_FALL || status_kind == *FIGHTER_STATUS_KIND_FALL_AERIAL
+    {
+        if (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_HI) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_LW) != 0  ||
+        (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_S_L) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_S_R) != 0{
+            StatusModule::change_status_request_from_script(boma, *FIGHTER_STATUS_KIND_DAMAGE_FALL, true);
+        }
+    }
+
 }
 
 pub unsafe fn meleeECBs(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, situation_kind: i32, fighter_kind: i32) {

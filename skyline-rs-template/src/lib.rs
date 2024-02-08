@@ -19,6 +19,8 @@ mod mythra;
 mod pyra;
 mod cloud;
 mod incineroar;
+mod sephiroth;
+mod samus;
 mod custom;
 
 #[skyline::main(name = "smashline_test")]
@@ -34,5 +36,7 @@ pub fn main() {
     pyra::install();
     cloud::install();
     incineroar::install();
+    sephiroth::install();
+    samus::install();
     custom::install();
 }
