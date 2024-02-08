@@ -44,7 +44,8 @@ mods = {
        hash("landing_attack_air_frame_f"): 9,
        hash("landing_attack_air_frame_b"): 11,
        hash("landing_attack_air_frame_hi"): 16,
-       hash("landing_attack_air_frame_lw"): 21,
+       hash("landing_attack_air_frame_lw"): 21, 
+       hash("attack_combo_max"): 1,
     },
     hash("fighter_kind_samus"): {
        hash("landing_attack_air_frame_b"): 9,
