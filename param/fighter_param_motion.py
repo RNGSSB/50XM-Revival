@@ -3,6 +3,15 @@ from pyprc import *
 fighter_param = param("fighter_param_motion_vanilla.prc")
 table = fighter_param[hash("fighter_param_motion_table")]
 
+mods = {
+hash("fighter_kind_elight"): {
+        hash("escape_f_hit_xlu_frame"): 4,
+        hash("escape_f_penalty_hit_xlu_frame"): 8,
+        hash("escape_b_hit_xlu_frame"): 5,
+        hash("escape_b_penalty_hit_xlu_frame"): 9,
+    }
+}
+
 # actual param traversal and editing
 for fighter in table:
     # the returned value is a hash, not a string
@@ -14,6 +23,8 @@ for fighter in table:
     fighter[hash("escape_n_penalty_hit_normal_frame")].value = 13
     fighter[hash("escape_n_cancel_frame")].value = 26
     fighter[hash("escape_attack_frame")].value = fighter[hash("escape_n_cancel_frame")].value 
+    fighter[hash("escape_air_hit_xlu_frame")].value = 3
+    fighter[hash("escape_air_hit_normal_frame")].value = 26
     fighter[hash("escape_air_slide_hit_xlu_frame")].value = 3
     fighter[hash("escape_air_slide_hit_normal_frame")].value = 19
     fighter[hash("escape_air_slide_penalty_hit_xlu_frame")].value = 3
@@ -28,6 +39,11 @@ for fighter in table:
     fighter[hash("escape_air_slide_cancel_frame")].value = 52
     fighter[hash("escape_air_slide_stiff_start_frame")].value = 999
     fighter[hash("landing_frame_escape_air_slide_max")].value = 13
+    
+    if fighter_name in mods:
+        fighter_mods = mods[fighter_name]
+        for key in fighter_mods:
+            fighter[key].value = fighter_mods[key]
 
 fighter_param.save("fighter_param_motion.prc")
 
