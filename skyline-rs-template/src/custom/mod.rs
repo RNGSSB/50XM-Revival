@@ -84,6 +84,33 @@ pub unsafe fn dashPlatformDrop(boma: &mut smash::app::BattleObjectModuleAccessor
     }
 }
 
+pub unsafe fn grabRefreshJumps(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, situation_kind: i32) { 
+    if [*FIGHTER_STATUS_KIND_CAPTURE_PULLED,
+    *FIGHTER_STATUS_KIND_CAPTURE_WAIT,
+    *FIGHTER_STATUS_KIND_CAPTURE_DAMAGE,
+    *FIGHTER_STATUS_KIND_CAPTURE_CUT,
+    *FIGHTER_STATUS_KIND_CAPTURE_JUMP,
+    *FIGHTER_STATUS_KIND_SHOULDERED_DONKEY,
+    *FIGHTER_STATUS_KIND_SWALLOWED,
+    *FIGHTER_STATUS_KIND_CLUNG_CAPTAIN,
+    *FIGHTER_STATUS_KIND_KOOPA_DIVED,
+    *FIGHTER_STATUS_KIND_CLUNG_GANON,
+    *FIGHTER_STATUS_KIND_MEWTWO_THROWN,
+    *FIGHTER_STATUS_KIND_BITTEN_WARIO_START,
+    *FIGHTER_STATUS_KIND_CLUNG_DIDDY,
+    *FIGHTER_STATUS_KIND_MIIFIGHTER_COUNTER_THROWN,
+    *FIGHTER_STATUS_KIND_CATCHED_REFLET,
+    *FIGHTER_STATUS_KIND_CATCHED_RIDLEY,
+    *FIGHTER_STATUS_KIND_CAPTURE_PULLED_FISHINGROD,
+    *FIGHTER_STATUS_KIND_SWING_GAOGAEN_CATCHED,
+    *FIGHTER_STATUS_KIND_CAPTURE_JACK_WIRE,
+    *FIGHTER_STATUS_KIND_DEMON_DIVED].contains(&status_kind) 
+    && WorkModule::get_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_JUMP_COUNT) == WorkModule::get_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_JUMP_COUNT_MAX)
+    {
+        WorkModule::dec_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_JUMP_COUNT);
+    }
+}
+
 const PIVOT_STICK_SNAPBACK_WINDOW: f32 = 1.0;
 const LIL_BOOSTIE: smash::phx::Vector3f = smash::phx::Vector3f {x: 1.6, y: 0.0, z: 0.0};
 unsafe fn pivots(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, curr_frame: f32, stick_value_x: f32){
@@ -606,6 +633,7 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     shieldStops(module_accessor, status_kind, cat1);
     shieldDrops(module_accessor, status_kind, cat2);
     dashPlatformDrop(module_accessor, status_kind, situation_kind, stick_value_y, stick_value_x);
+    grabRefreshJumps(module_accessor, status_kind, situation_kind);
     pivots(module_accessor, status_kind, curr_frame, stick_value_x);
     fixbackdash(module_accessor, status_kind, motion_kind, cat1, stick_value_y);
     lagCanceled(module_accessor, status_kind);

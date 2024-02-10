@@ -12,7 +12,8 @@ use smash::app::utility::get_kind;
 
 pub unsafe fn landCancels(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, situation_kind: i32, fighter_kind: i32) { //Fox & Falco Lasers
     if [*FIGHTER_KIND_SAMUS].contains(&fighter_kind) {
-        if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_S {
+        if status_kind == *FIGHTER_SAMUS_STATUS_KIND_SPECIAL_S1A ||
+        status_kind == *FIGHTER_SAMUS_STATUS_KIND_SPECIAL_S2A {
             if StatusModule::prev_situation_kind(boma) == *SITUATION_KIND_AIR && situation_kind == *SITUATION_KIND_GROUND {
                 StatusModule::change_status_request_from_script(boma, *FIGHTER_STATUS_KIND_LANDING, true);
             }

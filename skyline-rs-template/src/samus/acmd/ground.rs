@@ -10,7 +10,7 @@ use {
 
 unsafe extern "C" fn game_attack11(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 1.0);
-    macros::FT_MOTION_RATE(agent, 1.5);
+    macros::FT_MOTION_RATE(agent, 1.6);
     frame(agent.lua_state_agent, 3.0);
     macros::FT_MOTION_RATE(agent, 1.0);
     if macros::is_excute(agent) {

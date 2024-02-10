@@ -23,7 +23,7 @@ pub unsafe fn stick_y_flick_check(boma: &mut smash::app::BattleObjectModuleAcces
     return false;
 }
 
-pub unsafe fn landCancels(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, situation_kind: i32, fighter_kind: i32) { //Fox & Falco Lasers
+pub unsafe fn landCancels(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, situation_kind: i32, fighter_kind: i32, cat1: i32) { //Fox & Falco Lasers
     if [*FIGHTER_KIND_FOX].contains(&fighter_kind) {
         if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_N {
             if StatusModule::prev_situation_kind(boma) == *SITUATION_KIND_AIR && situation_kind == *SITUATION_KIND_GROUND {
@@ -36,6 +36,19 @@ pub unsafe fn landCancels(boma: &mut smash::app::BattleObjectModuleAccessor, sta
             if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_S{
                 if status_kind == *FIGHTER_STATUS_KIND_FALL || MotionModule::frame(boma) > 32.0 || CancelModule::is_enable_cancel(boma) {
                     StatusModule::change_status_request_from_script(boma, *FIGHTER_STATUS_KIND_FALL_SPECIAL, true);
+                }
+            }
+        }
+    }
+
+    if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_S{
+        if situation_kind == *SITUATION_KIND_AIR{
+            let touch_right = GroundModule::is_wall_touch_line(boma, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32);
+            let touch_left = GroundModule::is_wall_touch_line(boma, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32);
+            if touch_left || touch_right {
+                if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_WALL_JUMP_LEFT) != 0 || (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_WALL_JUMP_RIGHT) != 0
+                {
+                    StatusModule::change_status_request_from_script(boma, *FIGHTER_STATUS_KIND_WALL_JUMP, true);
                 }
             }
         }
@@ -61,7 +74,8 @@ unsafe extern "C" fn fox_on_main(fighter: &mut L2CFighterCommon) {
         let status_kind = StatusModule::status_kind(fighter.module_accessor);
         let fighter_kind = get_kind(module_accessor);
         let situation_kind = StatusModule::situation_kind(module_accessor);
-        landCancels(module_accessor, status_kind, situation_kind, fighter_kind);
+        let cat1 = ControlModule::get_command_flag_cat(fighter.module_accessor, 0);
+        landCancels(module_accessor, status_kind, situation_kind, fighter_kind, cat1);
         fastfallShit(module_accessor, status_kind, situation_kind, fighter_kind);
         global_fighter_frame(fighter);
     }
