@@ -31,8 +31,11 @@ static mut LAGCANCELED: [bool; 9] = [false; 9];
 static mut LEDGE_POS: [Vector3f; 9] = [smash::phx::Vector3f { x: 0.0, y: 0.0, z: 0.0}; 9];
 static mut ECB_Y_OFFSETS: [f32; 9] = [0.0; 9];
 static mut CURRENTMOMENTUM: [f32; 9] = [0.0; 9];
+static mut CANAIRDODGE: [bool; 9] = [true; 9];
+static mut CANWALLJUMP: [bool; 9] = [true; 9];
 
 mod jumpsquat;
+mod jabs;
 
 
 pub unsafe fn returnSmall(arg1: f32, arg2: f32) -> f32{
@@ -599,6 +602,36 @@ pub unsafe fn change_kinetic_hook(boma: &mut smash::app::BattleObjectModuleAcces
     original!()(boma, kinetic_type_new)
 }
 
+pub unsafe fn regainAirDodge(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, situation_kind: i32) {
+    if situation_kind != *SITUATION_KIND_AIR {
+        CANAIRDODGE[get_player_number(boma)] = true;
+        CANWALLJUMP[get_player_number(boma)] = true;
+    }
+    if status_kind == *FIGHTER_STATUS_KIND_ESCAPE_AIR {
+        CANAIRDODGE[get_player_number(boma)] = false;
+    }
+
+    if status_kind == *FIGHTER_STATUS_KIND_WALL_JUMP{
+        CANWALLJUMP[get_player_number(boma)] = false;
+    }
+}
+
+#[skyline::hook(replace = smash::app::lua_bind::WorkModule::is_enable_transition_term)]
+
+pub unsafe fn is_enable_transition_term_hook(boma: &mut smash::app::BattleObjectModuleAccessor, flag: i32) -> bool {
+    let status_kind = StatusModule::status_kind(boma);
+    let fighter_kind = get_kind(boma);
+   
+    if flag == *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ESCAPE_AIR {
+        if !CANAIRDODGE[get_player_number(boma)] {
+                return false;
+        }
+    }
+
+    original!()(boma, flag)
+}
+
+
 pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     JostleModule::set_team(fighter.module_accessor, 0);
     let lua_state = fighter.lua_state_agent;
@@ -640,6 +673,7 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     meleeECBs(module_accessor, status_kind, situation_kind, fighter_kind);
     jumpCancelMove(module_accessor, status_kind, fighter_kind, cat1, stick_value_y);
     additionalTransfer(lua_state, &mut l2c_agent, module_accessor, status_kind, situation_kind, fighter_kind);
+    regainAirDodge(module_accessor, status_kind, situation_kind);
 }
 
 fn nro_main(nro: &skyline::nro::NroInfo) {
@@ -677,6 +711,8 @@ pub fn install() {
     skyline::install_hook!(is_valid_just_shield_reflector_hook);
     skyline::install_hook!(exec_command_reset_attack_air_kind_hook); 
     skyline::install_hook!(change_kinetic_hook);
+    skyline::install_hook!(is_enable_transition_term_hook);
     jumpsquat::install();
+    jabs::install();
     nro::add_hook(nro_main).unwrap();
 }

@@ -9,6 +9,8 @@ use {
 
 use smash::app::utility::get_kind;
 
+static mut wallJumpUsed: bool = false;
+
 pub unsafe fn stick_y_flick_check(boma: &mut smash::app::BattleObjectModuleAccessor, flick_sensitivity: f32) -> bool {
     let stick_value_y = ControlModule::get_stick_y(boma);
     let cat2 = ControlModule::get_command_flag_cat(boma, 1);
@@ -41,6 +43,7 @@ pub unsafe fn landCancels(boma: &mut smash::app::BattleObjectModuleAccessor, sta
         }
     }
 
+    if !wallJumpUsed{
     if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_S{
         if situation_kind == *SITUATION_KIND_AIR{
             let touch_right = GroundModule::is_wall_touch_line(boma, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32);
@@ -53,6 +56,7 @@ pub unsafe fn landCancels(boma: &mut smash::app::BattleObjectModuleAccessor, sta
             }
         }
     }
+}
 }
 
 pub unsafe fn fastfallShit (boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, situation_kind: i32, fighter_kind: i32) {
@@ -77,6 +81,15 @@ unsafe extern "C" fn fox_on_main(fighter: &mut L2CFighterCommon) {
         let cat1 = ControlModule::get_command_flag_cat(fighter.module_accessor, 0);
         landCancels(module_accessor, status_kind, situation_kind, fighter_kind, cat1);
         fastfallShit(module_accessor, status_kind, situation_kind, fighter_kind);
+
+        if status_kind == *FIGHTER_STATUS_KIND_WALL_JUMP{
+            wallJumpUsed = true;
+        }
+
+        if situation_kind != *SITUATION_KIND_AIR {
+            wallJumpUsed = false;
+        }
+
         global_fighter_frame(fighter);
     }
 }
