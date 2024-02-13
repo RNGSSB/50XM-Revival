@@ -14,6 +14,25 @@ use smashline::Pre;
 use smash::lib::{L2CValue, L2CAgent};
 
 
-pub fn install(agent: &mut smashline::Agent) {
+unsafe extern "C" fn game_special(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 15.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_SAMUS_STATUS_SPECIAL_S_WORK_FLAG_WEAPON);
+    }
+}
 
+unsafe extern "C" fn game_specialair(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 15.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_SAMUS_STATUS_SPECIAL_S_WORK_FLAG_WEAPON);
+    }
+    frame(agent.lua_state_agent, 35.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_SAMUS_STATUS_SPECIAL_S_WORK_FLAG_AIR_CONTROL);
+    }
+}
+
+pub fn install(fighter: &mut smashline::Agent) {
+    fighter.game_acmd("game_special", game_special);
+    fighter.game_acmd("game_specialair", game_specialair);
 }
