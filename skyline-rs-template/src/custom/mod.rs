@@ -39,10 +39,11 @@ pub const SUB_STATUS: i32 = 0x15; //sub status, i32 value
 pub const STICK_X: i32 = 0x1A; //stick x, f32 value
 pub const MODULE_ACCESSOR: i32 = 0x5; //module accessor, ptr value
 pub const NONE_VECTOR: smash::phx::Vector3f = smash::phx::Vector3f {x: 0.0, y: 0.0, z: 0.0};
-
+pub const FIGHTER_INSTANCE_WORK_ID_INT_PARRIED: i32 = 0x921;
 
 mod jumpsquat;
 mod jabs;
+mod dashattack;
 
 
 pub unsafe fn returnSmall(arg1: f32, arg2: f32) -> f32{
@@ -847,5 +848,6 @@ pub fn install() {
     skyline::install_hook!(is_enable_transition_term_hook);
     jumpsquat::install();
     jabs::install();
+    dashattack::install();
     nro::add_hook(nro_main).unwrap();
 }
