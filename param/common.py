@@ -82,6 +82,10 @@ common[hash("shield_setoff_catch_frame")].value = 0
 #Shield Minimum Hold Frames
 common[hash("shield_min_frame")].value = 1
 
+#Shield Size
+common[hash("shield_scale_min")].value = 1 #It can't be that easy! It was that easy. (0.15 default, 1 to turn off shield poking!)
+common[hash("shield_dec1")].value = 0 #Shield depletion. Default is 0.15
+
 #Re grab timer, og is 60
 common[hash("invalid_capture_frame")].value = 40
 

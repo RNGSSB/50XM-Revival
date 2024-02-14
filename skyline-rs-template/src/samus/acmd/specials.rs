@@ -22,7 +22,7 @@ unsafe extern "C" fn game_special(agent: &mut L2CAgentBase) {
 }
 
 unsafe extern "C" fn game_specialair(agent: &mut L2CAgentBase) {
-    frame(agent.lua_state_agent, 15.0);
+    frame(agent.lua_state_agent, 14.0);
     if macros::is_excute(agent) {
         WorkModule::on_flag(agent.module_accessor, *FIGHTER_SAMUS_STATUS_SPECIAL_S_WORK_FLAG_WEAPON);
     }
