@@ -34,11 +34,10 @@ unsafe extern "C" fn special_lw_init(fighter: &mut L2CFighterCommon) -> L2CValue
             0.0
         );
     }
-    let original = smashline::original_status(smashline::Main, fighter, *FIGHTER_STATUS_KIND_SPECIAL_LW);
-    original(fighter)
+    0.into()
 }
 
 
 pub fn install(agent: &mut smashline::Agent) {
-    //agent.status(smashline::Main, *FIGHTER_STATUS_KIND_SPECIAL_LW, special_lw_init);
+    agent.status(smashline::Main, *FIGHTER_STATUS_KIND_SPECIAL_LW, special_lw_init);
 }

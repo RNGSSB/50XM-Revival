@@ -22,7 +22,9 @@ pub trait BomaExt {
 
 unsafe fn dacsa_check(&mut self) -> i32 {
     let fighter = util::get_fighter_common_from_accessor(self);
+    let module_accessor = &mut *fighter.module_accessor;
     let frame = MotionModule::frame(fighter.module_accessor);
+    let fighter_kind = get_kind(module_accessor);
     let f5 = [*FIGHTER_KIND_FOX, *FIGHTER_KIND_SONIC, *FIGHTER_KIND_LUIGI];
     let f6 = [*FIGHTER_KIND_PURIN, *FIGHTER_KIND_SHEIK, *FIGHTER_KIND_WARIO];
     let f7 = [*FIGHTER_KIND_DAISY, *FIGHTER_KIND_MARIOD, *FIGHTER_KIND_JACK, *FIGHTER_KIND_MARIO, *FIGHTER_KIND_MIIFIGHTER, *FIGHTER_KIND_GAMEWATCH, *FIGHTER_KIND_PALUTENA, *FIGHTER_KIND_PEACH, *FIGHTER_KIND_PFUSHIGISOU, *FIGHTER_KIND_PICHU, *FIGHTER_KIND_PIKACHU, *FIGHTER_KIND_ROSETTA, *FIGHTER_KIND_SNAKE, *FIGHTER_KIND_WIIFIT, *FIGHTER_KIND_ZELDA];
@@ -41,22 +43,22 @@ unsafe fn dacsa_check(&mut self) -> i32 {
     let f23 = [*FIGHTER_KIND_DEDEDE];
     //DACUS/DACDS
     if !AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_SHIELD)
-    && ((f5.contains(&fighter.kind()) && frame <= 5.0) 
-    || (f6.contains(&fighter.kind()) && frame <= 6.0)
-    || (f7.contains(&fighter.kind()) && frame <= 7.0) 
-    || (f8.contains(&fighter.kind()) && frame <= 8.0) 
-    || (f9.contains(&fighter.kind()) && frame <= 9.0) 
-    || (f10.contains(&fighter.kind()) && frame <= 10.0)
-    || (f11.contains(&fighter.kind()) && frame <= 11.0)
-    || (f12.contains(&fighter.kind()) && frame <= 12.0)
-    || (f13.contains(&fighter.kind()) && frame <= 13.0)
-    || (f14.contains(&fighter.kind()) && frame <= 14.0)
-    || (f15.contains(&fighter.kind()) && frame <= 15.0)
-    || (f16.contains(&fighter.kind()) && frame <= 16.0)
-    || (f18.contains(&fighter.kind()) && frame <= 18.0)
-    || (f21.contains(&fighter.kind()) && frame <= 21.0)
-    || (f22.contains(&fighter.kind()) && frame <= 22.0)
-    || (f23.contains(&fighter.kind()) && frame <= 23.0)) {
+    && ((f5.contains(&fighter_kind) && frame <= 5.0) 
+    || (f6.contains(&fighter_kind) && frame <= 6.0)
+    || (f7.contains(&fighter_kind) && frame <= 7.0) 
+    || (f8.contains(&fighter_kind) && frame <= 8.0) 
+    || (f9.contains(&fighter_kind) && frame <= 9.0) 
+    || (f10.contains(&fighter_kind) && frame <= 10.0)
+    || (f11.contains(&fighter_kind) && frame <= 11.0)
+    || (f12.contains(&fighter_kind) && frame <= 12.0)
+    || (f13.contains(&fighter_kind) && frame <= 13.0)
+    || (f14.contains(&fighter_kind) && frame <= 14.0)
+    || (f15.contains(&fighter_kind) && frame <= 15.0)
+    || (f16.contains(&fighter_kind) && frame <= 16.0)
+    || (f18.contains(&fighter_kind) && frame <= 18.0)
+    || (f21.contains(&fighter_kind) && frame <= 21.0)
+    || (f22.contains(&fighter_kind) && frame <= 22.0)
+    || (f23.contains(&fighter_kind) && frame <= 23.0)) {
         WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI4_START);
         WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_LW4_START);
         if WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI4_START) || WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_LW4_START) {
@@ -155,7 +157,7 @@ unsafe fn status_attackdash_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     }
     /* START OF NEW ADDITIONS */
     //DACUS/DACDS
-    if fighter.dacsa_check() == 1 {
+    if dacsa_check() == 1 {
         fighter.change_status(FIGHTER_STATUS_KIND_ATTACK_HI4_START.into(), true.into());
         return 1.into();
     }

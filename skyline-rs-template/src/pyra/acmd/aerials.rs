@@ -8,7 +8,6 @@ use {
     smash_script::*
 };
 
-use smash::hash40;
 
 unsafe extern "C" fn game_attackairhi(agent: &mut L2CAgentBase) {
     frame(agent.lua_state_agent, 2.0);
