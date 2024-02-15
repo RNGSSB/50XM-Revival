@@ -39,5 +39,5 @@ unsafe extern "C" fn special_lw_init(fighter: &mut L2CFighterCommon) -> L2CValue
 
 
 pub fn install(agent: &mut smashline::Agent) {
-    agent.status(smashline::Main, *FIGHTER_STATUS_KIND_SPECIAL_LW, special_lw_init);
+    agent.status(smashline::Pre, *FIGHTER_STATUS_KIND_SPECIAL_LW, special_lw_init);
 }

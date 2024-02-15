@@ -1,0 +1,26 @@
+{
+  "new-dir-files": {
+    "stage/poke_unova/normal/model/floating_plate_set": [
+      "stage/poke_unova/normal/model/floating_plate_set/bnsmy_near_bake_lit.nutexb",
+       "stage/poke_unova/normal/model/floating_plate_set/bnsmy_pbr_floor_a_col.nutexb",
+      "stage/poke_unova/normal/model/floating_plate_set/bnsmy_pbr_floor_a_nor.nutexb",
+       "stage/poke_unova/normal/model/floating_plate_set/bnsmy_pbr_floor_a_prm.nutexb",
+	   "stage/poke_unova/normal/model/floating_plate_set/bnsmy_pbr_floor_mozi_mask_col.nutexb",
+       "stage/poke_unova/normal/model/floating_plate_set/bnsmy_pbr_floor_mozi01_emi.nutexb",
+	   "stage/poke_unova/normal/model/floating_plate_set/bnsmy_pbr_floor_rock_col.nutexb",
+       "stage/poke_unova/normal/model/floating_plate_set/bnsmy_pbr_floor_rock_nor.nutexb",
+	   "stage/poke_unova/normal/model/floating_plate_set/bnsmy_pbr_floor_rock_prm.nutexb",
+       "stage/poke_unova/normal/model/floating_plate_set/bnsmy_pbr_mozi_light_emi.nutexb",
+	   "stage/poke_unova/normal/model/floating_plate_set/bnsmy_pbr_rock_side_col.nutexb",
+       "stage/poke_unova/normal/model/floating_plate_set/model.nuhlpb",
+	   "stage/poke_unova/normal/model/floating_plate_set/model.numatb",
+       "stage/poke_unova/normal/model/floating_plate_set/model.numdlb",
+	   "stage/poke_unova/normal/model/floating_plate_set/model.numshb",
+       "stage/poke_unova/normal/model/floating_plate_set/model.numshexb",
+	   "stage/poke_unova/normal/model/floating_plate_set/model.nusktb",
+       "stage/poke_unova/normal/model/floating_plate_set/model.nusrcmdlb",
+	   "stage/poke_unova/normal/model/floating_plate_set/model.xmb",
+       "stage/poke_unova/normal/model/floating_plate_set/pu_unova_cubemap_tile_cube_specular.nutexb"
+    ]
+  }
+}
