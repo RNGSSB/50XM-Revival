@@ -14,61 +14,7 @@ fn nro_hook(info: &skyline::nro::NroInfo) {
 pub fn install() {
     skyline::nro::add_hook(nro_hook);
 }
-//BomaExt, helps with various things
-pub trait BomaExt {
-    unsafe fn dacsa_check(&mut self) -> i32;
-}
 
-
-unsafe fn dacsa_check(&mut self) -> i32 {
-    let fighter = util::get_fighter_common_from_accessor(self);
-    let module_accessor = &mut *fighter.module_accessor;
-    let frame = MotionModule::frame(fighter.module_accessor);
-    let fighter_kind = get_kind(module_accessor);
-    let f5 = [*FIGHTER_KIND_FOX, *FIGHTER_KIND_SONIC, *FIGHTER_KIND_LUIGI];
-    let f6 = [*FIGHTER_KIND_PURIN, *FIGHTER_KIND_SHEIK, *FIGHTER_KIND_WARIO];
-    let f7 = [*FIGHTER_KIND_DAISY, *FIGHTER_KIND_MARIOD, *FIGHTER_KIND_JACK, *FIGHTER_KIND_MARIO, *FIGHTER_KIND_MIIFIGHTER, *FIGHTER_KIND_GAMEWATCH, *FIGHTER_KIND_PALUTENA, *FIGHTER_KIND_PEACH, *FIGHTER_KIND_PFUSHIGISOU, *FIGHTER_KIND_PICHU, *FIGHTER_KIND_PIKACHU, *FIGHTER_KIND_ROSETTA, *FIGHTER_KIND_SNAKE, *FIGHTER_KIND_WIIFIT, *FIGHTER_KIND_ZELDA];
-    let f8 = [*FIGHTER_KIND_CAPTAIN, *FIGHTER_KIND_PITB, *FIGHTER_KIND_GEKKOUGA, *FIGHTER_KIND_SHIZUE, *FIGHTER_KIND_KEN, *FIGHTER_KIND_KROOL, *FIGHTER_KIND_LITTLEMAC, *FIGHTER_KIND_LUCARIO, *FIGHTER_KIND_ROCKMAN, *FIGHTER_KIND_METAKNIGHT, *FIGHTER_KIND_TANTAN, *FIGHTER_KIND_PACKUN, *FIGHTER_KIND_PIT, *FIGHTER_KIND_ROBOT, *FIGHTER_KIND_RYU, *FIGHTER_KIND_TRAIL, *FIGHTER_KIND_TOONLINK, *FIGHTER_KIND_SZEROSUIT];
-    let f9 = [*FIGHTER_KIND_KOOPAJR, *FIGHTER_KIND_SAMUSD, *FIGHTER_KIND_DIDDY, *FIGHTER_KIND_FALCO, *FIGHTER_KIND_GAOGAEN, *FIGHTER_KIND_INKLING, *FIGHTER_KIND_NESS, *FIGHTER_KIND_PIKMIN, *FIGHTER_KIND_PZENIGAME, *FIGHTER_KIND_REFLET, *FIGHTER_KIND_PICKEL, *FIGHTER_KIND_YOUNGLINK];
-    let f10 = [*FIGHTER_KIND_BUDDY, *FIGHTER_KIND_MASTER, *FIGHTER_KIND_CLOUD, *FIGHTER_KIND_DONKEY, *FIGHTER_KIND_POPO, *FIGHTER_KIND_NANA, *FIGHTER_KIND_KIRBY, *FIGHTER_KIND_MIISWORDSMAN, *FIGHTER_KIND_ELIGHT, *FIGHTER_KIND_MURABITO];
-    let f11 = [*FIGHTER_KIND_DUCKHUNT, *FIGHTER_KIND_GANON, *FIGHTER_KIND_MEWTWO, *FIGHTER_KIND_MIIGUNNER, *FIGHTER_KIND_PACMAN, *FIGHTER_KIND_PLIZARDON, *FIGHTER_KIND_RICHTER, *FIGHTER_KIND_SIMON, *FIGHTER_KIND_DOLLY, *FIGHTER_KIND_YOSHI];
-    let f12 = [*FIGHTER_KIND_KOOPA, *FIGHTER_KIND_WOLF];
-    let f13 = [*FIGHTER_KIND_KAMUI, *FIGHTER_KIND_RIDLEY, *FIGHTER_KIND_SHULK];
-    let f14 = [*FIGHTER_KIND_CHROM, *FIGHTER_KIND_LUCAS, *FIGHTER_KIND_LUCINA, *FIGHTER_KIND_MARTH, *FIGHTER_KIND_ROY];
-    let f15 = [*FIGHTER_KIND_EDGE];
-    let f16 = [*FIGHTER_KIND_BAYONETTA, *FIGHTER_KIND_IKE, *FIGHTER_KIND_DEMON];
-    let f18 = [*FIGHTER_KIND_EFLAME];
-    let f21 = [*FIGHTER_KIND_LINK];
-    let f22 = [*FIGHTER_KIND_BRAVE];
-    let f23 = [*FIGHTER_KIND_DEDEDE];
-    //DACUS/DACDS
-    if !AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_SHIELD)
-    && ((f5.contains(&fighter_kind) && frame <= 5.0) 
-    || (f6.contains(&fighter_kind) && frame <= 6.0)
-    || (f7.contains(&fighter_kind) && frame <= 7.0) 
-    || (f8.contains(&fighter_kind) && frame <= 8.0) 
-    || (f9.contains(&fighter_kind) && frame <= 9.0) 
-    || (f10.contains(&fighter_kind) && frame <= 10.0)
-    || (f11.contains(&fighter_kind) && frame <= 11.0)
-    || (f12.contains(&fighter_kind) && frame <= 12.0)
-    || (f13.contains(&fighter_kind) && frame <= 13.0)
-    || (f14.contains(&fighter_kind) && frame <= 14.0)
-    || (f15.contains(&fighter_kind) && frame <= 15.0)
-    || (f16.contains(&fighter_kind) && frame <= 16.0)
-    || (f18.contains(&fighter_kind) && frame <= 18.0)
-    || (f21.contains(&fighter_kind) && frame <= 21.0)
-    || (f22.contains(&fighter_kind) && frame <= 22.0)
-    || (f23.contains(&fighter_kind) && frame <= 23.0)) {
-        WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI4_START);
-        WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_LW4_START);
-        if WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI4_START) || WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_LW4_START) {
-            if fighter.global_table[CMD_CAT1].get_i32() & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_HI4 != 0 || (fighter.global_table[STICK_Y].get_f32() > 0.7 && ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_ATTACK)) {
-                return 1;
-            }
-        }
-    }
-    return 0;
-}
 
 pub const STICK_X: i32 = 0x1A; //stick x, f32 value
 pub const IS_STOP: i32 = 0x8; //is stop, bool value
@@ -157,10 +103,10 @@ unsafe fn status_attackdash_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     }
     /* START OF NEW ADDITIONS */
     //DACUS/DACDS
-    if dacsa_check() == 1 {
+    /*if dacsa_check(fighter.module_accessor) == 1 {
         fighter.change_status(FIGHTER_STATUS_KIND_ATTACK_HI4_START.into(), true.into());
         return 1.into();
-    }
+    }*/
     /* END OF NEW ADDITIONS */
     if MotionModule::is_end(fighter.module_accessor) {
         let status = if situation_kind != *SITUATION_KIND_GROUND {
