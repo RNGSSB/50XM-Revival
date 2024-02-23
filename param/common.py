@@ -9,7 +9,7 @@ common[hash("precede_extension")].value = 0
 #Dash shit
 common[hash("turn_dash_frame")].value = -1
 common[hash("dash_escape_frame")].value = 1
-common[hash("dash_enable_attack_frame")].value = 3
+common[hash("dash_enable_attack_frame")].value = 1
 common[hash("dash_speed_keep_frame")].value = 1
 
 #Wavedash speed
@@ -90,7 +90,7 @@ common[hash("shield_dec1")].value = 0 #Shield depletion. Default is 0.15
 common[hash("invalid_capture_frame")].value = 40
 
 #Shield Drop Lag
-common[hash("guard_off_cancel_frame")].value = 7
+common[hash("guard_off_cancel_frame")].value = 11
 
 #Knockback Bounce Min Speed
 common[hash("damage_fly_reflect_d_speed")].value = 0.8 #Default 0.8 #5.0 works fine for something like Melee Fox Down Throw

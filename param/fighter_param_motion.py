@@ -5,10 +5,7 @@ table = fighter_param[hash("fighter_param_motion_table")]
 
 mods = {
 hash("fighter_kind_elight"): {
-        hash("escape_f_hit_xlu_frame"): 4,
-        hash("escape_f_penalty_hit_xlu_frame"): 8,
-        hash("escape_b_hit_xlu_frame"): 5,
-        hash("escape_b_penalty_hit_xlu_frame"): 9,
+        
     }
 }
 
@@ -19,10 +16,14 @@ for fighter in table:
     
     fighter[hash("escape_n_hit_xlu_frame")].value = 3
     fighter[hash("escape_n_hit_normal_frame")].value = 16
-    fighter[hash("escape_n_penalty_hit_xlu_frame")].value = 6
-    fighter[hash("escape_n_penalty_hit_normal_frame")].value = 13
     fighter[hash("escape_n_cancel_frame")].value = 26
     fighter[hash("escape_attack_frame")].value = fighter[hash("escape_n_cancel_frame")].value 
+    fighter[hash("escape_f_hit_xlu_frame")].value = 4
+    fighter[hash("escape_f_hit_normal_frame")].value = 19
+    fighter[hash("escape_f_cancel_frame")].value = 32
+    fighter[hash("escape_b_hit_xlu_frame")].value = 4
+    fighter[hash("escape_b_hit_normal_frame")].value = 21
+    fighter[hash("escape_b_cancel_frame")].value = 38
     fighter[hash("escape_air_hit_xlu_frame")].value = 3
     fighter[hash("escape_air_hit_normal_frame")].value = 26
     fighter[hash("escape_air_slide_hit_xlu_frame")].value = 3

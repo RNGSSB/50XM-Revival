@@ -1,0 +1,23 @@
+{
+    "new-dir-infos": [
+        "stage/streetpass/normal/model/floating_plate_set"
+    ],
+    "new-dir-files": {
+        "stage/streetpass/normal/model/floating_plate_set": [
+            "stage/streetpass/normal/model/floating_plate_set/bnsmy_base_lit_ink.nutexb",
+			"stage/streetpass/normal/model/floating_plate_set/bnsmy_floating_plate_col.nutexb",
+			"stage/streetpass/normal/model/floating_plate_set/bnsmy_floating_plate_lit.nutexb",
+			"stage/streetpass/normal/model/floating_plate_set/bnsmy_floating_plate_nor.nutexb",
+			"stage/streetpass/normal/model/floating_plate_set/bnsmy_floating_plate_prm.nutexb",
+			"stage/streetpass/normal/model/floating_plate_set/model.nuhlpb",
+			"stage/streetpass/normal/model/floating_plate_set/model.numatb",
+			"stage/streetpass/normal/model/floating_plate_set/model.numdlb",
+			"stage/streetpass/normal/model/floating_plate_set/model.numshb",
+			"stage/streetpass/normal/model/floating_plate_set/model.numshexb",
+			"stage/streetpass/normal/model/floating_plate_set/model.nusktb",
+			"stage/streetpass/normal/model/floating_plate_set/model.nusrcmdlb",
+			"stage/streetpass/normal/model/floating_plate_set/model.xmb",
+			"stage/streetpass/normal/model/floating_plate_set/streetpass_cube_spc.nutexb"
+        ]
+    }
+}
