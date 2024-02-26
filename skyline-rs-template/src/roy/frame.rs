@@ -44,7 +44,7 @@ unsafe extern "C" fn roy_on_main(fighter: &mut L2CFighterCommon) {
                                 StatusModule::change_status_request_from_script(module_accessor, *FIGHTER_STATUS_KIND_WALL_JUMP, true);
                             
                         }
-                    }
+                    } 
                 }
             }
         }

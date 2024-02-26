@@ -111,6 +111,14 @@ unsafe extern "C" fn game_attack11(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 12.0);
     if macros::is_excute(agent) {
+        if !AttackModule::is_infliction_status(agent.module_accessor, *COLLISION_KIND_MASK_HIT)
+        || AttackModule::is_infliction_status(agent.module_accessor, *COLLISION_KIND_MASK_SHIELD) {
+            CancelModule::enable_cancel(agent.module_accessor);
+        }
+    }
+
+    frame(agent.lua_state_agent, 16.0);
+    if macros::is_excute(agent) {
             CancelModule::enable_cancel(agent.module_accessor);
     }
 }
@@ -139,6 +147,14 @@ unsafe extern "C" fn game_attack12(agent: &mut L2CAgentBase) {
         WorkModule::off_flag(agent.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_100);
     }
     frame(agent.lua_state_agent, 13.0);
+    if macros::is_excute(agent) {
+        if !AttackModule::is_infliction_status(agent.module_accessor, *COLLISION_KIND_MASK_HIT)
+        || AttackModule::is_infliction_status(agent.module_accessor, *COLLISION_KIND_MASK_SHIELD) {
+            CancelModule::enable_cancel(agent.module_accessor);
+        }
+    }
+
+    frame(agent.lua_state_agent, 18.0);
     if macros::is_excute(agent) {
             CancelModule::enable_cancel(agent.module_accessor);
     }

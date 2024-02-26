@@ -27,7 +27,15 @@ unsafe extern "C" fn game_attack11(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 15.0);
     if macros::is_excute(agent) {
-        CancelModule::enable_cancel(agent.module_accessor);
+        if !AttackModule::is_infliction_status(agent.module_accessor, *COLLISION_KIND_MASK_HIT)
+        || AttackModule::is_infliction_status(agent.module_accessor, *COLLISION_KIND_MASK_SHIELD) {
+            CancelModule::enable_cancel(agent.module_accessor);
+        }
+    }
+
+    frame(agent.lua_state_agent, 20.0);
+    if macros::is_excute(agent) {
+            CancelModule::enable_cancel(agent.module_accessor);
     }
 }
 

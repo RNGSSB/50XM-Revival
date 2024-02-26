@@ -15,9 +15,9 @@ unsafe extern "C" fn game_attacks3(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 5.0);
     if macros::is_excute(agent) {
-        macros::ATTACK(agent, 0, 0, Hash40::new("legr"), 6.0, 74, 100, 0, 40, 3.8, 0.7, 0.0, 0.0, None, None, None, 0.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(agent, 1, 0, Hash40::new("kneer"), 6.0, 74, 100, 0, 40, 3.0, 0.4, 0.0, 0.0, None, None, None, 0.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(agent, 2, 0, Hash40::new("kneer"), 6.0, 74, 108, 0, 40, 4.0, 4.3, -0.2, 0.0, None, None, None, 0.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(agent, 0, 0, Hash40::new("legr"), 6.0, 74, 180, 0, 20, 3.8, 0.7, 0.0, 0.0, None, None, None, 0.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(agent, 1, 0, Hash40::new("kneer"), 6.0, 74, 180, 0, 20, 3.0, 0.4, 0.0, 0.0, None, None, None, 0.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(agent, 2, 0, Hash40::new("kneer"), 6.0, 74, 188, 0, 20, 4.0, 4.3, -0.2, 0.0, None, None, None, 0.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
     wait(agent.lua_state_agent, 4.0);
     if macros::is_excute(agent) {
@@ -98,6 +98,14 @@ unsafe extern "C" fn game_attack11(agent: &mut L2CAgentBase) {
     }
     frame(agent.lua_state_agent, 11.0);
     if macros::is_excute(agent) {
+        if !AttackModule::is_infliction_status(agent.module_accessor, *COLLISION_KIND_MASK_HIT)
+        || AttackModule::is_infliction_status(agent.module_accessor, *COLLISION_KIND_MASK_SHIELD) {
+            CancelModule::enable_cancel(agent.module_accessor);
+        }
+    }
+
+    frame(agent.lua_state_agent, 16.0);
+    if macros::is_excute(agent) {
             CancelModule::enable_cancel(agent.module_accessor);
     }
 }
@@ -119,6 +127,14 @@ unsafe extern "C" fn game_attack12(agent: &mut L2CAgentBase) {
         WorkModule::on_flag(agent.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
     }
     frame(agent.lua_state_agent, 11.0);
+    if macros::is_excute(agent) {
+        if !AttackModule::is_infliction_status(agent.module_accessor, *COLLISION_KIND_MASK_HIT)
+        || AttackModule::is_infliction_status(agent.module_accessor, *COLLISION_KIND_MASK_SHIELD) {
+            CancelModule::enable_cancel(agent.module_accessor);
+        }
+    }
+
+    frame(agent.lua_state_agent, 16.0);
     if macros::is_excute(agent) {
             CancelModule::enable_cancel(agent.module_accessor);
     }
