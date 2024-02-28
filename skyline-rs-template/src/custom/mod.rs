@@ -306,7 +306,7 @@ pub unsafe fn init_settings_edges(boma: &mut BattleObjectModuleAccessor, situati
         *FIGHTER_STATUS_KIND_SQUAT_F, *FIGHTER_STATUS_KIND_SQUAT_B, *FIGHTER_STATUS_KIND_SQUAT_RV, *FIGHTER_STATUS_KIND_LANDING, *FIGHTER_STATUS_KIND_LANDING_LIGHT, 
         *FIGHTER_STATUS_KIND_LANDING_FALL_SPECIAL, *FIGHTER_STATUS_KIND_LANDING_DAMAGE_LIGHT, *FIGHTER_STATUS_KIND_GUARD_DAMAGE,
         *FIGHTER_STATUS_KIND_DAMAGE, *FIGHTER_STATUS_KIND_RUN, *FIGHTER_STATUS_KIND_TURN_RUN,
-        *FIGHTER_STATUS_KIND_APPEAL, *FIGHTER_STATUS_KIND_ESCAPE_AIR, *FIGHTER_STATUS_KIND_ESCAPE_AIR_SLIDE].contains(&status_kind) {
+        *FIGHTER_STATUS_KIND_APPEAL, *FIGHTER_STATUS_KIND_ESCAPE_AIR, *FIGHTER_STATUS_KIND_ESCAPE_AIR_SLIDE, *FIGHTER_STATUS_KIND_LANDING_ATTACK_AIR].contains(&status_kind) {
             fix = *GROUND_CORRECT_KIND_GROUND as u32;
         }
         /*if situation_kind == *SITUATION_KIND_GROUND {
@@ -466,7 +466,7 @@ pub unsafe fn can_entry_cliff_hook(boma: &mut smash::app::BattleObjectModuleAcce
             return 0 as u64;
         }
     }
-    if (status_kind != *FIGHTER_STATUS_KIND_FALL_AERIAL && status_kind != *FIGHTER_STATUS_KIND_JUMP_AERIAL && status_kind != *FIGHTER_STATUS_KIND_FALL && 
+    /*if (status_kind != *FIGHTER_STATUS_KIND_FALL_AERIAL && status_kind != *FIGHTER_STATUS_KIND_JUMP_AERIAL && status_kind != *FIGHTER_STATUS_KIND_FALL && 
     status_kind != *FIGHTER_STATUS_KIND_FLY && status_kind != *FIGHTER_STATUS_KIND_AIR_LASSO && ![*FIGHTER_KIND_PFUSHIGISOU, *FIGHTER_KIND_MASTER, *FIGHTER_KIND_TANTAN].contains(&fighter_kind) && (fighter_kind != *FIGHTER_KIND_JACK ||  
         ![*FIGHTER_JACK_STATUS_KIND_SPECIAL_HI_CUT, *FIGHTER_JACK_STATUS_KIND_SPECIAL_HI_THROW, *FIGHTER_STATUS_KIND_SPECIAL_HI].contains(&status_kind)) &&
         (![*FIGHTER_KIND_SIMON, *FIGHTER_KIND_RICHTER].contains(&fighter_kind) || status_kind != *FIGHTER_STATUS_KIND_ATTACK_AIR)) || motion_kind == 61345827621 { //Edgehog/trump
@@ -480,7 +480,7 @@ pub unsafe fn can_entry_cliff_hook(boma: &mut smash::app::BattleObjectModuleAcce
                 return 0 as u64;
             }
         }
-    }
+    }*/
     original!()(boma)
 }
 
@@ -839,8 +839,8 @@ pub fn install() {
     skyline::install_hook!(get_param_float_hook);
     skyline::install_hook!(init_settings_hook);
     skyline::install_hook!(correct_hook);
-    skyline::install_hook!(entry_cliff_hook);
-    skyline::install_hook!(leave_cliff_hook);
+    //skyline::install_hook!(entry_cliff_hook);
+    //skyline::install_hook!(leave_cliff_hook);
     skyline::install_hook!(can_entry_cliff_hook);
     skyline::install_hook!(is_valid_just_shield_reflector_hook);
     skyline::install_hook!(exec_command_reset_attack_air_kind_hook); 

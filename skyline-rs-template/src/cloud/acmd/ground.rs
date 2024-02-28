@@ -108,12 +108,39 @@ unsafe extern "C" fn game_attackhi4(agent: &mut L2CAgentBase) {
     }
 }
 
+unsafe extern "C" fn game_attacklw3(agent: &mut L2CAgentBase) {
+    frame(agent.lua_state_agent, 7.0);
+    if macros::is_excute(agent) {
+        macros::ATTACK(agent, 0, 0, Hash40::new("kneer"), 7.0, 80, 75, 0, 80, 3.6, 5.0, -1.0, 1.5, Some(1.5), Some(-1.0), Some(1.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(agent, 1, 0, Hash40::new("top"), 6.0, 80, 75, 0, 80, 2.5, 0.0, 2.5, -2.6, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        AttackModule::set_attack_height_all(agent.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
+        macros::HIT_NODE(agent, Hash40::new("kneel"), *HIT_STATUS_XLU);
+        macros::HIT_NODE(agent, Hash40::new("legl"), *HIT_STATUS_XLU);
+    }
+    frame(agent.lua_state_agent, 9.0);
+    if macros::is_excute(agent) {
+        AttackModule::clear(agent.module_accessor, 1, false);
+    }
+    frame(agent.lua_state_agent, 18.0);
+    if macros::is_excute(agent) {
+        AttackModule::clear_all(agent.module_accessor);
+        HitModule::set_status_all(agent.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
+    }
+    frame(agent.lua_state_agent, 32.0);
+    if macros::is_excute(agent) {
+        if AttackModule::is_infliction_status(agent.module_accessor, *COLLISION_KIND_MASK_SHIELD) {
+            CancelModule::enable_cancel(agent.module_accessor);
+        }
+    }
+}
+
 
 pub fn install(agent: &mut smashline::Agent) {
     agent.game_acmd("game_attackdash", game_attackdash);
     agent.game_acmd("game_attack11", game_attack11);
     agent.game_acmd("game_attack12", game_attack12);
     agent.game_acmd("game_attackhi4", game_attackhi4);
+    agent.game_acmd("game_attacklw3", game_attacklw3);
     //fighter.effect_acmd("effect_attackairf", effect_attackairf);
     //fighter.sound_acmd("sound_attackairf", sound_attackairf);
 }

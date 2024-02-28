@@ -14,9 +14,14 @@ mods = {
         hash("landing_attack_air_frame_lw"): 9,
         hash("landing_attack_air_frame_f"): 8,
         hash("landing_attack_air_frame_hi"): 9,
+        hash("landing_attack_air_frame_b"): 7,
     },
     hash("fighter_kind_mario"): {
         hash("landing_attack_air_frame_lw"): 13,
+    },
+    hash("fighter_kind_marth"): {
+        hash("landing_attack_air_frame_lw"): 12,
+        hash("landing_attack_air_frame_f"): 7,
     },
     hash("fighter_kind_sheik"): {
         hash("landing_attack_air_frame_lw"): 10,
@@ -32,11 +37,14 @@ mods = {
     },
     hash("fighter_kind_captain"): {
        hash("landing_attack_air_frame_f"): 9,
+       hash("landing_attack_air_frame_b"): 9,
+       hash("landing_attack_air_frame_hi"): 7,
     },
     hash("fighter_kind_gaogaen"): {
        hash("run_speed_max"): 1.18,
        hash("jump_squat_frame"): 4,
        hash("landing_attack_air_frame_n"): 8,
+       hash("landing_attack_air_frame_f"): 12,
        hash("landing_attack_air_frame_lw"): 13,
     },
     hash("fighter_kind_edge"): {
@@ -50,6 +58,14 @@ mods = {
     hash("fighter_kind_samus"): {
        hash("landing_attack_air_frame_b"): 9,
        hash("landing_attack_air_frame_hi"): 10,
+    },
+    hash("fighter_kind_wolf"): {
+       hash("landing_attack_air_frame_n"): 7,
+       hash("landing_attack_air_frame_b"): 10,
+       hash("landing_attack_air_frame_lw"): 11,
+    },
+    hash("fighter_kind_roy"): {
+       hash("landing_attack_air_frame_lw"): 12,
     },
 }
 

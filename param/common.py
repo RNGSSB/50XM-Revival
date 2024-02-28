@@ -26,6 +26,7 @@ common[hash("no_rapid_frame_value")].value = 40
 
 #Footstool invul
 common[hash("tread_jump_after_xlu_frame")].value = 0
+common[hash("tread_jump_speed_limit")].value = 999
 
 #Ledge
 common[hash("cliff_no_catch_frame")].value = 0
