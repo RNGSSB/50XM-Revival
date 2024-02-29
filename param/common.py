@@ -106,6 +106,11 @@ common[hash("air_lasso_landing_frame")].value = 30 # 30 default
 common[hash("air_lasso_catch_num")].value = 999
 common[hash("cliff_max_count")].value = 999
 
+#Ledge Invul
+common[hash("cliff_wait_air_xlu_max_frame")].value = -15 #Maximum ledge invul frames added from being airborne. Default 60
+common[hash("cliff_wait_damage_xlu_max_frame")].value = 0 #Maximum ledge invul added from damage. Default 44
+common[hash("cliff_wait_xlu_min_frame")].value = 11 #Minimum lede invul frames. Does not count the initial 19 frame anim. Default is 4
+
 #Ledge Jump Lag Frames
 common[hash("cliff_jump_disable_attack_frame")].value = 4 #2 Default
 
