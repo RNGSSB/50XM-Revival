@@ -39,7 +39,7 @@ for fighter in table:
     fighter[hash("escape_air_slide_end_speed")].value = 0
     fighter[hash("escape_air_slide_cancel_frame")].value = 52
     fighter[hash("escape_air_slide_stiff_start_frame")].value = 999
-    fighter[hash("landing_frame_escape_air_slide_max")].value = 10
+    fighter[hash("landing_frame_escape_air_slide_max")].value = 13
     
     if fighter_name in mods:
         fighter_mods = mods[fighter_name]
