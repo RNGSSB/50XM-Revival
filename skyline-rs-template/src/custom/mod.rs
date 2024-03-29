@@ -179,9 +179,9 @@ pub unsafe fn lagCanceled(boma: &mut smash::app::BattleObjectModuleAccessor, sta
     }
 }
 
-pub unsafe fn shieldDrops(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, cat2: i32) {
+pub unsafe fn shieldDrops(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, cat2: i32 , cat1: i32)  {
     if status_kind == *FIGHTER_STATUS_KIND_GUARD || status_kind == *FIGHTER_STATUS_KIND_GUARD_ON || status_kind == *FIGHTER_STATUS_KIND_GUARD_OFF { //Shield Drop
-        if (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_GUARD_TO_PASS) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_HI) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_LW) != 0  ||
+        if (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_GUARD_TO_PASS) != 0 && (cat1 & *FIGHTER_PAD_CMD_CAT1_ESCAPE) == 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_HI) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_LW) != 0  ||
         (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_S_L) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_S_R) != 0 {
             if GroundModule::is_passable_ground(boma) {
                 StatusModule::change_status_request_from_script(boma, *FIGHTER_STATUS_KIND_PASS, true);
@@ -466,6 +466,12 @@ pub unsafe fn can_entry_cliff_hook(boma: &mut smash::app::BattleObjectModuleAcce
             return 0 as u64;
         }
     }
+
+    if [*FIGHTER_KIND_MASTER].contains(&fighter_kind) && status_kind != *FIGHTER_STATUS_KIND_AIR_LASSO && status_kind != 248 &&
+        ([*FIGHTER_STATUS_KIND_SPECIAL_HI].contains(&status_kind))
+        {
+            return 0 as u64;
+        }
     /*if (status_kind != *FIGHTER_STATUS_KIND_FALL_AERIAL && status_kind != *FIGHTER_STATUS_KIND_JUMP_AERIAL && status_kind != *FIGHTER_STATUS_KIND_FALL && 
     status_kind != *FIGHTER_STATUS_KIND_FLY && status_kind != *FIGHTER_STATUS_KIND_AIR_LASSO && ![*FIGHTER_KIND_PFUSHIGISOU, *FIGHTER_KIND_MASTER, *FIGHTER_KIND_TANTAN].contains(&fighter_kind) && (fighter_kind != *FIGHTER_KIND_JACK ||  
         ![*FIGHTER_JACK_STATUS_KIND_SPECIAL_HI_CUT, *FIGHTER_JACK_STATUS_KIND_SPECIAL_HI_THROW, *FIGHTER_STATUS_KIND_SPECIAL_HI].contains(&status_kind)) &&
@@ -761,6 +767,8 @@ unsafe fn status_guarddamage_common(fighter: &mut L2CFighterCommon, param_1: L2C
     fighter.global_table[SUB_STATUS].assign(&L2CValue::Ptr(L2CFighterCommon_bind_address_call_sub_GuardDamageUniq as *const () as _));
 }
 
+
+
 pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     JostleModule::set_team(fighter.module_accessor, 0);
     let lua_state = fighter.lua_state_agent;
@@ -793,7 +801,7 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     }
 
     shieldStops(module_accessor, status_kind, cat1);
-    shieldDrops(module_accessor, status_kind, cat2);
+    shieldDrops(module_accessor, status_kind, cat2, cat1);
     dashPlatformDrop(module_accessor, status_kind, situation_kind, stick_value_y, stick_value_x);
     grabRefreshJumps(module_accessor, status_kind, situation_kind);
     pivots(module_accessor, status_kind, curr_frame, stick_value_x);
@@ -813,9 +821,9 @@ fn nro_main(nro: &skyline::nro::NroInfo) {
                 status_attack_air_hook,
                 sub_ftstatusuniqprocessguardfunc_updateshield,
                 fighterstatusguard_set_shield_scale,
-                effect_guardoncommon,
-                sub_ftstatusuniqprocessguarddamage_initstatus,
-                status_guarddamage_common
+                effect_guardoncommon
+                //sub_ftstatusuniqprocessguarddamage_initstatus,
+                //status_guarddamage_common
             );
         }
         _ => (),

@@ -21,6 +21,12 @@ mod cloud;
 mod incineroar;
 mod sephiroth;
 mod samus;
+mod pikachu;
+mod greninja;
+mod mewtwo;
+mod byleth;
+mod bowser;
+mod ness;
 mod custom;
 
 #[skyline::main(name = "smashline_test")]
@@ -38,5 +44,11 @@ pub fn main() {
     incineroar::install();
     sephiroth::install();
     samus::install();
+    pikachu::install();
+    greninja::install();
+    mewtwo::install();
+    byleth::install();
+    bowser::install();
+    ness::install();
     custom::install();
 }

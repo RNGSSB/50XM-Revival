@@ -67,6 +67,9 @@ mods = {
     hash("fighter_kind_roy"): {
        hash("landing_attack_air_frame_lw"): 12,
     },
+    hash("fighter_kind_master"): {
+       hash("landing_attack_air_frame_lw"): 28,
+    },
 }
 
 

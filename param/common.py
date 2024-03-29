@@ -118,5 +118,8 @@ common[hash("cliff_jump_disable_attack_frame")].value = 4 #2 Default
 #Platform Drop Speed???
 common[hash("pass_speed_y")].value = -0.5 #default -0.5
 
+#Crouch Cancel
+common[hash("squat_damage_reaction_mul")].value = 0.67 #default 0.85
+
 common.save("common.prc")
 

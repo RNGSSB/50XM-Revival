@@ -39,7 +39,7 @@ cd..
 
 copy /y "skyline-rs-template\target\aarch64-skyline-switch\debug\plugin.nro" "C:\Users\RNG\Documents\GitHub\50XM-Revival\50XM"
 
-xcopy /y /e "50XM" "C:\Users\RNG\AppData\Roaming\yuzu\sdmc\ultimate\mods\50XM"
+xcopy /y /e "50XM" "C:\Users\RNG\AppData\Roaming\suyu\sdmc\ultimate\mods\50XM"
 
 cmd /k
 
