@@ -180,8 +180,8 @@ pub unsafe fn lagCanceled(boma: &mut smash::app::BattleObjectModuleAccessor, sta
 }
 
 pub unsafe fn shieldDrops(boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, cat2: i32 , cat1: i32)  {
-    if status_kind == *FIGHTER_STATUS_KIND_GUARD || status_kind == *FIGHTER_STATUS_KIND_GUARD_ON || status_kind == *FIGHTER_STATUS_KIND_GUARD_OFF { //Shield Drop
-        if (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_GUARD_TO_PASS) != 0 && (cat1 & *FIGHTER_PAD_CMD_CAT1_ESCAPE) == 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_HI) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_LW) != 0  ||
+    if status_kind == *FIGHTER_STATUS_KIND_GUARD || status_kind == *FIGHTER_STATUS_KIND_GUARD_ON { //Shield Drop
+        if (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_GUARD_TO_PASS) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_HI) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_LW) != 0  ||
         (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_S_L) != 0 || (cat2 & *FIGHTER_PAD_CMD_CAT2_FLAG_APPEAL_S_R) != 0 {
             if GroundModule::is_passable_ground(boma) {
                 StatusModule::change_status_request_from_script(boma, *FIGHTER_STATUS_KIND_PASS, true);
@@ -459,7 +459,7 @@ pub unsafe fn can_entry_cliff_hook(boma: &mut smash::app::BattleObjectModuleAcce
         }
     }
     if KineticModule::get_sum_speed_y(boma, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN) > 0.0 { //Melee style sweetspots
-        if ![*FIGHTER_KIND_PFUSHIGISOU, *FIGHTER_KIND_TANTAN, *FIGHTER_KIND_MASTER].contains(&fighter_kind) && status_kind != *FIGHTER_STATUS_KIND_AIR_LASSO && status_kind != 248 &&
+        if ![*FIGHTER_KIND_PFUSHIGISOU, *FIGHTER_KIND_TANTAN].contains(&fighter_kind) && status_kind != *FIGHTER_STATUS_KIND_AIR_LASSO && status_kind != 248 &&
         (fighter_kind != *FIGHTER_KIND_JACK || ![*FIGHTER_JACK_STATUS_KIND_SPECIAL_HI_CUT, *FIGHTER_JACK_STATUS_KIND_SPECIAL_HI_THROW, *FIGHTER_STATUS_KIND_SPECIAL_HI].contains(&status_kind)) &&
         (fighter_kind != *FIGHTER_KIND_SHIZUE || ![*FIGHTER_STATUS_KIND_SPECIAL_S, *FIGHTER_SHIZUE_STATUS_KIND_SPECIAL_S_START, *FIGHTER_SHIZUE_STATUS_KIND_SPECIAL_S_THROW].contains(&status_kind)) &&
         (![*FIGHTER_KIND_SIMON, *FIGHTER_KIND_RICHTER].contains(&fighter_kind) || status_kind != *FIGHTER_STATUS_KIND_ATTACK_AIR)  {
@@ -467,8 +467,7 @@ pub unsafe fn can_entry_cliff_hook(boma: &mut smash::app::BattleObjectModuleAcce
         }
     }
 
-    if [*FIGHTER_KIND_MASTER].contains(&fighter_kind) && status_kind != *FIGHTER_STATUS_KIND_AIR_LASSO && status_kind != 248 &&
-        ([*FIGHTER_STATUS_KIND_SPECIAL_HI].contains(&status_kind))
+    if [*FIGHTER_KIND_MASTER].contains(&fighter_kind) && ([*FIGHTER_STATUS_KIND_SPECIAL_HI].contains(&status_kind))
         {
             return 0 as u64;
         }
@@ -630,6 +629,34 @@ pub unsafe fn regainAirDodge(boma: &mut smash::app::BattleObjectModuleAccessor, 
     }
 }
 
+pub unsafe fn djcs (lua_state: u64, l2c_agent: &mut L2CAgent, boma: &mut smash::app::BattleObjectModuleAccessor, status_kind: i32, fighter_kind: i32, kinetic_type: i32) {
+    if [*FIGHTER_KIND_NESS, *FIGHTER_KIND_MEWTWO].contains(&fighter_kind){ //DJCs
+        if status_kind == *FIGHTER_STATUS_KIND_ATTACK_AIR {
+            if kinetic_type == *FIGHTER_KINETIC_TYPE_JUMP_AERIAL_MOTION_2ND {
+                if MotionModule::frame(boma) < (7.0) {
+                    if !(ControlModule::check_button_on(boma, *CONTROL_PAD_BUTTON_JUMP)) {
+                        KineticModule::change_kinetic(boma, *FIGHTER_KINETIC_TYPE_MOTION_FALL);
+                    }
+                }
+            }
+        }
+    }
+    if [*FIGHTER_KIND_PEACH].contains(&fighter_kind) {
+        if status_kind == *FIGHTER_STATUS_KIND_ATTACK_AIR {
+            if StatusModule::prev_status_kind(boma, 0) == *FIGHTER_STATUS_KIND_JUMP_AERIAL {
+                if MotionModule::frame(boma) < (7.0) {
+                    if !(ControlModule::check_button_on(boma, *CONTROL_PAD_BUTTON_JUMP)) {
+                        l2c_agent.clear_lua_stack();
+                        l2c_agent.push_lua_stack(&mut L2CValue::new_int(*FIGHTER_KINETIC_ENERGY_ID_GRAVITY as u64));
+                        l2c_agent.push_lua_stack(&mut L2CValue::new_num(0.0));
+                        smash::app::sv_kinetic_energy::set_speed(lua_state);
+                    }
+                }
+            }
+        }
+    }
+}
+
 #[skyline::hook(replace = smash::app::lua_bind::WorkModule::is_enable_transition_term)]
 
 pub unsafe fn is_enable_transition_term_hook(boma: &mut smash::app::BattleObjectModuleAccessor, flag: i32) -> bool {
@@ -784,6 +811,7 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     let stick_value_x = ControlModule::get_stick_x(fighter.module_accessor);
     let motion_kind = MotionModule::motion_kind(fighter.module_accessor);
     let curr_frame = MotionModule::frame(fighter.module_accessor);
+    let kinetic_type = KineticModule::get_kinetic_type(fighter.module_accessor);
 
     //Held Buffer
     let control_pad = [
@@ -811,6 +839,7 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     jumpCancelMove(module_accessor, status_kind, fighter_kind, cat1, stick_value_y);
     additionalTransfer(lua_state, &mut l2c_agent, module_accessor, status_kind, situation_kind, fighter_kind);
     regainAirDodge(module_accessor, status_kind, situation_kind);
+    djcs(lua_state, &mut l2c_agent, module_accessor, status_kind, fighter_kind, kinetic_type);
 }
 
 fn nro_main(nro: &skyline::nro::NroInfo) {

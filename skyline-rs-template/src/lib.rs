@@ -27,6 +27,8 @@ mod mewtwo;
 mod byleth;
 mod bowser;
 mod ness;
+mod falco;
+mod lucario;
 mod custom;
 
 #[skyline::main(name = "smashline_test")]
@@ -50,5 +52,7 @@ pub fn main() {
     byleth::install();
     bowser::install();
     ness::install();
+    falco::install();
+    lucario::install();
     custom::install();
 }

@@ -42,18 +42,23 @@ mods = {
     },
     hash("fighter_kind_gaogaen"): {
        hash("run_speed_max"): 1.18,
-       hash("jump_squat_frame"): 4,
        hash("landing_attack_air_frame_n"): 8,
        hash("landing_attack_air_frame_f"): 12,
        hash("landing_attack_air_frame_lw"): 13,
     },
     hash("fighter_kind_edge"): {
-       hash("jump_squat_frame"): 4,
        hash("landing_attack_air_frame_f"): 9,
        hash("landing_attack_air_frame_b"): 11,
        hash("landing_attack_air_frame_hi"): 16,
        hash("landing_attack_air_frame_lw"): 21, 
        hash("attack_combo_max"): 1,
+    },
+    hash("fighter_kind_falco"): {
+       hash("landing_attack_air_frame_n"): 7,
+       hash("landing_attack_air_frame_b"): 10,
+       hash("landing_attack_air_frame_lw"): 9,
+       hash("dash_speed"): 1.9,
+       hash("run_speed_max"): 1.5,
     },
     hash("fighter_kind_samus"): {
        hash("landing_attack_air_frame_b"): 9,
