@@ -112,6 +112,7 @@ for fighter in table:
     fighter[hash("run_speed_max")].value = runspeed
     fighter[hash("air_speed_x_stable")].value = airspeed
     fighter[hash("wall_jump_type")].value = True
+    fighter[hash("attach_wall_type")].value = False
     
     
     if fighter_name in mods:
