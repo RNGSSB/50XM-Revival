@@ -75,6 +75,9 @@ mods = {
     hash("fighter_kind_master"): {
        hash("landing_attack_air_frame_lw"): 28,
     },
+    hash("fighter_kind_pikachu"): {
+       hash("scale"): 1,
+    },
 }
 
 

@@ -180,6 +180,7 @@ pub fn install(fighter: &mut smashline::Agent) {
     fighter.game_acmd("game_speciallw", game_speciallw);
     fighter.game_acmd("game_specialsstart", game_specialsstart);
     fighter.game_acmd("game_specialhihold", game_specialhihold);
+    fighter.game_acmd("game_specialhiholdair", game_specialhihold);
     fighter.effect_acmd("effect_speciallw", effect_speciallw);
     fighter.effect_acmd("effect_specialairlw", effect_specialairlw);
     fighter.sound_acmd("sound_specialairlw", sound_specialairlw);  
