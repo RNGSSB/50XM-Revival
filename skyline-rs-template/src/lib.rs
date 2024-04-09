@@ -29,6 +29,7 @@ mod bowser;
 mod ness;
 mod falco;
 mod lucario;
+mod luigi;
 mod custom;
 
 #[skyline::main(name = "smashline_test")]
@@ -54,5 +55,6 @@ pub fn main() {
     ness::install();
     falco::install();
     lucario::install();
+    luigi::install();
     custom::install();
 }
