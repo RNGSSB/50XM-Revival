@@ -79,6 +79,9 @@ mods = {
        hash("scale"): 1,
        hash("landing_attack_air_frame_n"): 7,
     },
+    hash("fighter_kind_lucario"): {
+       hash("landing_attack_air_frame_n"): 7,
+    },
     hash("fighter_kind_luigi"): {
        hash("air_lasso_type"): False,
        hash("ground_brake"): 0.025,
