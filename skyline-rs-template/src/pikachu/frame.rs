@@ -30,7 +30,7 @@ unsafe extern "C" fn char_on_main(fighter: &mut L2CFighterCommon) {
         }
         if !wallJumpUsed{
         if status_kind == *FIGHTER_STATUS_KIND_SPECIAL_S || status_kind == *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_S_ATTACK
-        || status_kind == *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_WEAK || status_kind == *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_S_END
+        || status_kind == *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_S_WEAK || status_kind == *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_S_END
         {
             if situation_kind == *SITUATION_KIND_AIR{
                 let touch_right = GroundModule::is_wall_touch_line(module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32);
