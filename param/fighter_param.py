@@ -54,6 +54,11 @@ mods = {
        hash("attack_combo_max"): 1,
     },
     hash("fighter_kind_falco"): {
+       hash("air_accel_y"): 0.17,
+       hash("air_speed_y_stable"): 3.1,
+       hash("damage_fly_top_speed_y_stable"): 3.1,
+       hash("damage_fly_top_air_accel_y"): 0.17,
+       hash("dive_speed_y"): 3.5,
        hash("landing_attack_air_frame_n"): 7,
        hash("landing_attack_air_frame_b"): 10,
        hash("landing_attack_air_frame_lw"): 9,
@@ -85,6 +90,13 @@ mods = {
     hash("fighter_kind_luigi"): {
        hash("air_lasso_type"): False,
        hash("ground_brake"): 0.025,
+    },
+    hash("fighter_kind_trail"): {
+       hash("run_speed_max"): 1.58,
+       hash("air_speed_x_stable"): 1.2,
+       hash("landing_attack_air_frame_n"): 7,
+       hash("landing_attack_air_frame_f"): 9,
+       hash("landing_attack_air_frame_lw"): 12,
     },
 }
 
