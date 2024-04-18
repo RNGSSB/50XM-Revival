@@ -23,6 +23,10 @@ mods = {
         hash("landing_attack_air_frame_lw"): 12,
         hash("landing_attack_air_frame_f"): 7,
     },
+    hash("fighter_kind_lucina"): {
+        hash("landing_attack_air_frame_lw"): 12,
+        hash("landing_attack_air_frame_f"): 7,
+    },
     hash("fighter_kind_sheik"): {
         hash("landing_attack_air_frame_lw"): 10,
     },
