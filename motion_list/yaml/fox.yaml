@@ -2351,7 +2351,7 @@ list:
       fix_rot: false
       fix_scale: false
       unk_40: false
-      unk_80: true
+      unk_80: false
       unk_100: false
       unk_200: false
       unk_400: false

@@ -2159,7 +2159,7 @@ list:
     extra:
       xlu_start: 0
       xlu_end: 0
-      cancel_frame: 23
+      cancel_frame: 25
       no_stop_intp: false
   attack_s3_s:
     game_script: game_attacks3
@@ -2189,7 +2189,7 @@ list:
     extra:
       xlu_start: 0
       xlu_end: 0
-      cancel_frame: 23
+      cancel_frame: 25
       no_stop_intp: false
   attack_s3_lw:
     game_script: game_attacks3lw
@@ -2219,7 +2219,7 @@ list:
     extra:
       xlu_start: 0
       xlu_end: 0
-      cancel_frame: 23
+      cancel_frame: 25
       no_stop_intp: false
   attack_hi3:
     game_script: game_attackhi3
@@ -2249,7 +2249,7 @@ list:
     extra:
       xlu_start: 0
       xlu_end: 0
-      cancel_frame: 37
+      cancel_frame: 30
       no_stop_intp: false
   attack_lw3:
     game_script: game_attacklw3
@@ -2351,7 +2351,7 @@ list:
       fix_rot: false
       fix_scale: false
       unk_40: false
-      unk_80: true
+      unk_80: false
       unk_100: false
       unk_200: false
       unk_400: false

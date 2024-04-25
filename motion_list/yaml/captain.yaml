@@ -2159,7 +2159,7 @@ list:
     extra:
       xlu_start: 0
       xlu_end: 0
-      cancel_frame: 40
+      cancel_frame: 35
       no_stop_intp: false
   attack_s3_hi:
     game_script: game_attacks3hi
@@ -2441,7 +2441,7 @@ list:
       fix_rot: false
       fix_scale: false
       unk_40: false
-      unk_80: true
+      unk_80: false
       unk_100: false
       unk_200: false
       unk_400: false
@@ -2459,7 +2459,7 @@ list:
     extra:
       xlu_start: 0
       xlu_end: 0
-      cancel_frame: 52
+      cancel_frame: 46
       no_stop_intp: false
   attack_hi4_hold:
     game_script: game_attackhi4charge
@@ -2669,7 +2669,7 @@ list:
     extra:
       xlu_start: 0
       xlu_end: 0
-      cancel_frame: 30
+      cancel_frame: 32
       no_stop_intp: false
   attack_air_lw:
     game_script: game_attackairlw
