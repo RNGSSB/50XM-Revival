@@ -61,6 +61,8 @@ unsafe fn status_attackdash_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     let const_stick_x = fighter.global_table[STICK_X].get_f32(); 
     let lr = PostureModule::lr(boma);
     let stick_x = const_stick_x * lr;
+    let stick_value_y = ControlModule::get_stick_y(fighter.module_accessor);
+    let cat1 = ControlModule::get_command_flag_cat(fighter.module_accessor, 0);
     let turn_run_stick_x = WorkModule::get_param_float(boma, hash40("common"), hash40("turn_run_stick_x"));
     let situation_kind = fighter.global_table[SITUATION_KIND].get_i32();
     if CancelModule::is_enable_cancel(fighter.module_accessor) && fighter.sub_wait_ground_check_common(false.into()).get_bool() || fighter.sub_air_check_fall_common().get_bool() {
@@ -87,6 +89,20 @@ unsafe fn status_attackdash_main(fighter: &mut L2CFighterCommon) -> L2CValue {
             WorkModule::set_int64(fighter.module_accessor, 0, *FIGHTER_STATUS_WORK_ID_INT_RESERVE_LOG_ATTACK_KIND);
         }
     }
+    /* START OF NEW ADDITIONS */
+    //DACUS/DACDS
+    if frame <= 6.0 
+    && ((!AttackModule::is_infliction_status(boma, *COLLISION_KIND_MASK_HIT) && !AttackModule::is_infliction_status(boma, *COLLISION_KIND_MASK_SHIELD)) 
+    || [*FIGHTER_KIND_FALCO, *FIGHTER_KIND_SNAKE].contains(&fighter_kind)){
+        WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI4_START);
+        if WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI4_START){
+            if cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_HI4 != 0 || (stick_value_y > 0.7 && ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_ATTACK)) {
+                fighter.change_status(FIGHTER_STATUS_KIND_ATTACK_HI4_START.into(), true.into());
+                return 1.into();
+            }
+        }
+    }
+    /* END OF NEW ADDITIONS */
     let turn_run_check = {stick_x * lr <= turn_run_stick_x};
     if WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_CATCH_TURN)
     && turn_run_check
@@ -101,13 +117,6 @@ unsafe fn status_attackdash_main(fighter: &mut L2CFighterCommon) -> L2CValue {
         fighter.change_status(FIGHTER_STATUS_KIND_CATCH_DASH.into(), true.into());
         return 0.into();
     }
-    /* START OF NEW ADDITIONS */
-    //DACUS/DACDS
-    /*if dacsa_check(fighter.module_accessor) == 1 {
-        fighter.change_status(FIGHTER_STATUS_KIND_ATTACK_HI4_START.into(), true.into());
-        return 1.into();
-    }*/
-    /* END OF NEW ADDITIONS */
     if MotionModule::is_end(fighter.module_accessor) {
         let status = if situation_kind != *SITUATION_KIND_GROUND {
             FIGHTER_STATUS_KIND_FALL

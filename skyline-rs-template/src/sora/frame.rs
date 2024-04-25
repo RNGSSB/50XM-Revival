@@ -50,7 +50,22 @@ unsafe extern "C" fn char_on_main(fighter: &mut L2CFighterCommon) {
 
     if status_kind == *FIGHTER_TRAIL_STATUS_KIND_SPECIAL_S_ATTACK || status_kind == *FIGHTER_TRAIL_STATUS_KIND_SPECIAL_S_END {
         if AttackModule::is_infliction_status(module_accessor, *COLLISION_KIND_MASK_HIT) {
-            CancelModule::enable_cancel(module_accessor);
+            if ControlModule::check_button_trigger(module_accessor, *CONTROL_PAD_BUTTON_JUMP) || (ControlModule::is_enable_flick_jump(module_accessor) && ControlModule::check_button_on(module_accessor, *CONTROL_PAD_BUTTON_FLICK_JUMP)) {
+                if situation_kind == *SITUATION_KIND_AIR{
+                    if WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_JUMP_COUNT) < WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_JUMP_COUNT_MAX){
+                        StatusModule::change_status_request_from_script(module_accessor, *FIGHTER_STATUS_KIND_JUMP_AERIAL, true);
+                    }
+                }
+                else if situation_kind == *SITUATION_KIND_GROUND{
+                    StatusModule::change_status_request_from_script(module_accessor, *FIGHTER_STATUS_KIND_JUMP_SQUAT, true);
+                }
+            }
+
+            if ControlModule::check_button_trigger(module_accessor, *CONTROL_PAD_BUTTON_GUARD){
+                if situation_kind == *SITUATION_KIND_AIR{
+                    StatusModule::change_status_request_from_script(module_accessor, *FIGHTER_STATUS_KIND_ESCAPE_AIR_SLIDE, true);
+                }
+            }
         }
     }
         global_fighter_frame(fighter);

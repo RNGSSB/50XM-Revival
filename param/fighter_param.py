@@ -22,10 +22,14 @@ mods = {
     hash("fighter_kind_marth"): {
         hash("landing_attack_air_frame_lw"): 12,
         hash("landing_attack_air_frame_f"): 7,
+        hash("weight"): 85,
     },
     hash("fighter_kind_lucina"): {
         hash("landing_attack_air_frame_lw"): 12,
         hash("landing_attack_air_frame_f"): 7,
+        hash("run_speed_max"): 1.964,
+        hash("air_speed_x_stable"): 1.071,
+        hash("ground_brake"): 0.055,
     },
     hash("fighter_kind_sheik"): {
         hash("landing_attack_air_frame_lw"): 10,
@@ -36,8 +40,8 @@ mods = {
        hash("landing_attack_air_frame_n"): 9,
     },
     hash("fighter_kind_cloud"): {
-       hash("landing_attack_air_frame_f"): 13,
-       hash("landing_attack_air_frame_b"): 11,
+       hash("landing_attack_air_frame_f"): 11,
+       hash("landing_attack_air_frame_b"): 8,
     },
     hash("fighter_kind_captain"): {
        hash("landing_attack_air_frame_f"): 9,
@@ -78,7 +82,7 @@ mods = {
        hash("landing_attack_air_frame_b"): 10,
        hash("landing_attack_air_frame_lw"): 11,
     },
-    hash("fighter_kind_roy"): {
+    hash("fighter_kind_roy"): {    
        hash("landing_attack_air_frame_lw"): 12,
     },
     hash("fighter_kind_master"): {
@@ -101,6 +105,22 @@ mods = {
        hash("landing_attack_air_frame_n"): 7,
        hash("landing_attack_air_frame_f"): 9,
        hash("landing_attack_air_frame_lw"): 12,
+    },
+    hash("fighter_kind_dolly"): {
+       hash("jump_speed_x"): 1,
+       hash("jump_speed_x_mul"): 1,
+       hash("dash_speed"): 2.3,
+       hash("run_speed_max"): 1.72,
+       hash("air_brake_x"): 0.00009,
+       hash("air_accel_y"): 0.14,
+       hash("air_speed_y_stable"): 2.4,
+       hash("damage_fly_top_speed_y_stable"): 2.4,
+       hash("damage_fly_top_air_accel_y"): 0.14,
+       hash("dive_speed_y"): 2.8,
+       hash("attack_combo_max"): 1,
+       hash("landing_attack_air_frame_lw"): 11,
+       hash("landing_attack_air_frame_b"): 9,
+       hash("landing_attack_air_frame_f"): 7,
     },
 }
 

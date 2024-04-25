@@ -32,6 +32,7 @@ mod lucario;
 mod luigi;
 mod sora;
 mod lucina;
+mod snake;
 mod custom;
 
 #[skyline::main(name = "smashline_test")]
@@ -61,4 +62,5 @@ pub fn main() {
     custom::install();
     lucina::install();
     sora::install();
+    snake::install();
 }
