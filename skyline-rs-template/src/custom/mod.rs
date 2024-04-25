@@ -798,10 +798,10 @@ fn nro_main(nro: &skyline::nro::NroInfo) {
         "common" => {
             skyline::install_hooks!(
                 status_jump_sub_hook,
-                status_attack_air_hook,
-                sub_ftstatusuniqprocessguardfunc_updateshield,
-                fighterstatusguard_set_shield_scale,
-                effect_guardoncommon
+                status_attack_air_hook//,
+                //sub_ftstatusuniqprocessguardfunc_updateshield,
+                //fighterstatusguard_set_shield_scale,
+                //effect_guardoncommon
             );
         }
         _ => (),

@@ -61,9 +61,9 @@ unsafe extern "C" fn char_on_main(fighter: &mut L2CFighterCommon) {
                 }
             }
 
-            if ControlModule::check_button_trigger(module_accessor, *CONTROL_PAD_BUTTON_GUARD){
+            if (cat1 & *FIGHTER_PAD_CMD_CAT1_FLAG_ESCAPE) != 0 {
                 if situation_kind == *SITUATION_KIND_AIR{
-                    StatusModule::change_status_request_from_script(module_accessor, *FIGHTER_STATUS_KIND_ESCAPE_AIR_SLIDE, true);
+                    StatusModule::change_status_request_from_script(module_accessor, *FIGHTER_STATUS_KIND_ESCAPE_AIR, true);
                 }
             }
         }

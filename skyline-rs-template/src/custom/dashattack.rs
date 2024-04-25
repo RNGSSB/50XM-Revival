@@ -91,7 +91,7 @@ unsafe fn status_attackdash_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     }
     /* START OF NEW ADDITIONS */
     //DACUS/DACDS
-    if frame <= 6.0 
+    if (frame <= 6.0 && frame >= 3.0) 
     && ((!AttackModule::is_infliction_status(boma, *COLLISION_KIND_MASK_HIT) && !AttackModule::is_infliction_status(boma, *COLLISION_KIND_MASK_SHIELD)) 
     || [*FIGHTER_KIND_FALCO, *FIGHTER_KIND_SNAKE].contains(&fighter_kind)){
         WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI4_START);

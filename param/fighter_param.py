@@ -122,6 +122,12 @@ mods = {
        hash("landing_attack_air_frame_b"): 9,
        hash("landing_attack_air_frame_f"): 7,
     },
+    hash("fighter_kind_snake"): {
+       hash("ground_brake"): 0.0542,
+       hash("landing_attack_air_frame_lw"): 15,
+       hash("landing_attack_air_frame_b"): 11,
+       hash("landing_attack_air_frame_f"): 12,
+    },
 }
 
 
