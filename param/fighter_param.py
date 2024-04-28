@@ -127,6 +127,8 @@ mods = {
        hash("landing_attack_air_frame_lw"): 15,
        hash("landing_attack_air_frame_b"): 11,
        hash("landing_attack_air_frame_f"): 12,
+       hash("landing_attack_air_frame_f"): 8,
+       hash("landing_attack_air_frame_hi"): 10,
     },
 }
 
